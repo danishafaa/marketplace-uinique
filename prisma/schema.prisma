@@ -5,11 +5,65 @@
 // Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
 
 generator client {
-  provider = "prisma-client"
+  provider = "prisma-client-js"
   output   = "../src/generated/prisma"
 }
 
 datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
+}
+
+// Model 1: Profile (Wajib, relasi ke Supabase Auth)
+model Profile {
+  id        String    @id @default(uuid()) // ID ini akan sama dengan ID dari auth.users
+  email     String    @unique
+  name      String?
+  isSeller  Boolean   @default(false)
+  store     Store?    // Relasi 1-ke-1 ke Toko
+  orders    Order[]   // Relasi 1-ke-banyak sebagai Pembeli
+}
+
+// Model 2: Store (Toko/Penjual)
+model Store {
+  id          String    @id @default(cuid())
+  name        String    @unique
+  description String?
+  profileId   String    @unique
+  profile     Profile   @relation(fields: [profileId], references: [id])
+  products    Product[]
+}
+
+// Model 3: Product
+model Product {
+  id          String    @id @default(cuid())
+  name        String
+  description String
+  price       Int       // Gunakan Integer (sen/rupiah terkecil) untuk menghindari error floating point
+  imageUrl    String?
+  storeId     String
+  store       Store     @relation(fields: [storeId], references: [id])
+  orderItems  OrderItem[]
+}
+
+// Model 4 & 5: Order & OrderItem
+model Order {
+  id            String      @id @default(cuid())
+  buyerId       String
+  buyer         Profile     @relation(fields: [buyerId], references: [id])
+  totalAmount   Int
+  status        String      @default("PENDING") // PENDING, PAID, SHIPPED, etc.
+  midtransToken String?
+  createdAt     DateTime    @default(now())
+  items         OrderItem[]
+}
+
+model OrderItem {
+  id        String  @id @default(cuid())
+  orderId   String
+  order     Order   @relation(fields: [orderId], references: [id])
+  productId String
+  product   Product @relation(fields: [productId], references: [id])
+  quantity  Int
+  price     Int
 }
