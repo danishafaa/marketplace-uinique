@@ -29,7 +29,7 @@ async function getProducts() {
       id: true,
       name: true,
       products: {
-        orderBy: { createdAt: 'desc' }
+        orderBy: { name: 'desc' }
       }
     },
   });
