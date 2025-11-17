@@ -66,6 +66,7 @@ export async function createProduct(formData: FormData) {
         });
 
         revalidatePath('/dashboard/seller/products'); // Refresh cache Next.js
+        revalidatePath('/'); // <-- TAMBAHKAN INI (Membersihkan cache Halaman Utama)
         return { success: true };
     } catch (error: unknown) {
         console.error("Create Product Error:", error);
@@ -103,6 +104,7 @@ export async function deleteProduct(productId: string): Promise<void> {
         }
 
         revalidatePath('/dashboard/seller/products');
+        revalidatePath('/'); // <-- TAMBAHKAN INI JUGA
         // ✅ Tidak return value, hanya void
     } catch (error: unknown) {
         console.error("Delete Product Error:", error);
