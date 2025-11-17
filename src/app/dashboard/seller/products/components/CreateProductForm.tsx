@@ -2,22 +2,33 @@
 'use client';
 
 import { useState } from 'react';
-import { createProduct } from '../actions';
+import { createProduct } from '../actions'; // Pastikan import ini benar
 
 export function CreateProductForm() {
     const [isLoading, setIsLoading] = useState(false);
 
+    // Fungsi handleSubmit yang diperbaiki
     async function handleSubmit(formData: FormData) {
         setIsLoading(true);
-        try {
-            await createProduct(formData);
-            // Reset form atau refresh halaman
+
+        // Panggil server action DAN tangkap hasilnya
+        const result = await createProduct(formData);
+
+        setIsLoading(false);
+
+        // Periksa hasil dari server action
+        if (result.success) {
+            // SUKSES: Tampilkan pesan dan reload
+            alert('Produk berhasil ditambahkan!');
             window.location.reload();
-        } catch (error) {
-            console.error('Error creating product:', error);
-        } finally {
-            setIsLoading(false);
+        } else {
+            // GAGAL: Tampilkan pesan error dari backend
+            // Ini adalah pesan error RLS yang kita cari!
+            alert(`Error: ${result.message || 'Gagal menambahkan produk.'}`);
         }
+
+        // Kita tidak perlu try...catch di sini karena server action
+        // sudah menangani error-nya dan mengembalikannya sebagai objek.
     }
 
     return (
@@ -30,7 +41,7 @@ export function CreateProductForm() {
                         type="text"
                         name="name"
                         required
-                        className="w-full p-2 border rounded"
+                        className="w-full p-2 border rounded text-black" // Tambah text-black
                         placeholder="Nama produk"
                     />
                 </div>
@@ -40,7 +51,7 @@ export function CreateProductForm() {
                         type="number"
                         name="price"
                         required
-                        className="w-full p-2 border rounded"
+                        className="w-full p-2 border rounded text-black" // Tambah text-black
                         placeholder="Harga"
                     />
                 </div>
@@ -49,7 +60,7 @@ export function CreateProductForm() {
                     <textarea
                         name="description"
                         required
-                        className="w-full p-2 border rounded"
+                        className="w-full p-2 border rounded text-black" // Tambah text-black
                         placeholder="Deskripsi produk"
                         rows={3}
                     />
@@ -61,7 +72,7 @@ export function CreateProductForm() {
                         name="imageFile"
                         accept="image/*"
                         required
-                        className="w-full p-2 border rounded"
+                        className="w-full p-2 border rounded text-black" // Tambah text-black
                     />
                 </div>
             </div>
