@@ -3,16 +3,17 @@
 'use client'
 
 import { useState } from 'react'
-import { createSupabaseClient } from '@/utils/supabase/client' // Gunakan helper client Anda
+import { createSupabaseClient } from '@/utils/supabase/client'
+import { useRouter } from 'next/navigation' // 1. IMPORT ROUTER
 
 export default function LoginPage() {
     const [email, setEmail] = useState('')
     const [password, setPassword] = useState('')
     const [message, setMessage] = useState('')
-
-    const supabase = createSupabaseClient()
+    const router = useRouter() // 2. INISIALISASI ROUTER
 
     const handleSignUp = async () => {
+        const supabase = createSupabaseClient(); // Inisialisasi di dalam handler
         setMessage('Processing...')
         const { error } = await supabase.auth.signUp({
             email,
@@ -22,11 +23,13 @@ export default function LoginPage() {
         if (error) {
             setMessage(error.message)
         } else {
-            setMessage('Success! Check your email for confirmation.')
+            setMessage('Success! Check your email for confirmation. Redirecting to login...')
+            router.push('/login') // OPsional: redirect ke login setelah daftar
         }
     }
 
     const handleSignIn = async () => {
+        const supabase = createSupabaseClient(); // Inisialisasi di dalam handler
         setMessage('Processing...')
         const { error } = await supabase.auth.signInWithPassword({
             email,
@@ -37,7 +40,10 @@ export default function LoginPage() {
             setMessage(error.message)
         } else {
             setMessage('Signed in successfully! Redirecting...')
-            // Di sini Anda bisa menambahkan redirect ke halaman /dashboard
+
+            // 3. TAMBAHKAN REDIRECT INI:
+            // Arahkan ke halaman setup toko setelah login berhasil
+            router.push('/dashboard/seller/setup')
         }
     }
 
@@ -45,20 +51,27 @@ export default function LoginPage() {
         <div className="flex flex-col items-center justify-center min-h-screen">
             <h1 className="text-3xl font-bold mb-6">Marketplace Login/Signup</h1>
             <div className="w-full max-w-md bg-white p-8 shadow-md rounded-lg">
-                {message && <p className="text-sm text-red-500 mb-4">{message}</p>}
+                {message && (
+                    <p
+                        // Perbaikan kecil: Logika warna pesan
+                        className={`text-sm mb-4 ${message.includes('Error') || message.includes('failed') ? 'text-red-500' : 'text-green-500'}`}
+                    >
+                        {message}
+                    </p>
+                )}
                 <input
                     type="email"
                     placeholder="Email"
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
-                    className="w-full p-3 mb-4 border rounded"
+                    className="w-full p-3 mb-4 border rounded text-black" // Tambahkan text-black
                 />
                 <input
                     type="password"
                     placeholder="Password"
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
-                    className="w-full p-3 mb-6 border rounded"
+                    className="w-full p-3 mb-6 border rounded text-black" // Tambahkan text-black
                 />
                 <div className="flex justify-between space-x-4">
                     <button
