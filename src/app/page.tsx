@@ -3,15 +3,9 @@
 import { prisma } from '@/lib/prisma';
 import Link from 'next/link';
 import Image from 'next/image';
-import SidebarKategori from '@/components/SidebarKategori'; // <-- TAMBAH BARIS INI
-import HeroSectionContent from '@/components/HeroSectionContent'; // <-- TAMBAHKAN BARIS INI
-import ProductCard from '@/components/ProductCard'; // <-- TAMBAHKAN BARIS INI
-import PromoBanners from '@/components/PromoBanners'; // <-- TAMBAHKAN BARIS INI
+import HeroSection from '@/components/HeroSection'; // <-- 1. IMPORT HERO SECTION
 
-export const dynamic = 'force-dynamic'
-export const revalidate = 0
-
-// Definisikan tipe untuk product (dipertahankan)
+// Definisikan tipe untuk product (sudah ada)
 interface Product {
   id: string;
   name: string;
@@ -23,64 +17,73 @@ interface Product {
   createdAt: Date;
 }
 
-// Fetching data di Server Component (dipertahankan)
+// Fetching data di Server Component (sudah ada)
 async function getProducts(): Promise<Product[]> {
+  // Ambil semua produk, termasuk nama toko (Store) yang menjualnya
   const products = await prisma.product.findMany({
     include: { store: true },
-    orderBy: { createdAt: 'desc' },
+    orderBy: { createdAt: 'desc' }, // Tampilkan produk terbaru di atas
+    // Anda bisa menambahkan 'take: 20' untuk membatasi jumlah di halaman awal
   });
   return products;
 }
 
-
+export const dynamic = 'force-dynamic'
+export const revalidate = 0
 export default async function HomePage() {
   const products = await getProducts();
 
   return (
-    // Kontainer Utama: Padding dan Lebar Maksimal
-    <div className="bg-lightgray min-h-screen">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    // 2. MODIFIKASI WRAPPER UTAMA
+    <div className="flex flex-col min-h-screen">
 
-        {/* Konten Utama - Menggunakan Grid 3 Kolom Sesuai Referensi */}
-        <div className="grid grid-cols-12 gap-6">
+      {/* 3. TAMBAHKAN HERO SECTION DI ATAS */}
+      <HeroSection />
 
-          {/* Kolom 1: Kategori Sidebar (3/12 lebar) */}
-          <div className="col-span-12 lg:col-span-3 hidden lg:block">
-            <aside className="sticky top-20">
-              <h2 className="text-xl font-bold mb-4 text-darkgray border-b pb-2">Kategori</h2>
-              {/* Ganti dengan komponen yang diimpor: */}
-              <SidebarKategori /> {/* <-- GUNAKAN KOMPONEN BARU */}
-            </aside>
-          </div>
+      {/* 4. WRAPPER UNTUK KONTEN PRODUK */}
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 flex-grow w-full">
+        <h1 className="text-3xl font-extrabold mb-8 text-center text-gray-800">
+          Semua Produk Terbaru
+        </h1>
 
-          {/* Kolom 2: Hero & Daftar Produk (9/12 lebar) */}
-          <div className="col-span-12 lg:col-span-9">
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+          {products.map((product: Product) => (
+            <Link
+              key={product.id}
+              href={`/products/${product.id}`}
+              className="block border rounded-lg shadow-md hover:shadow-xl transition-shadow duration-300 overflow-hidden"
+            >
 
-            {/* Area 1.A: Hero Section (Akan dibuat di Langkah 3) */}
-            <HeroSectionContent />
+              {/* Gambar Produk */}
+              <div className="relative w-full h-48">
+                <Image
+                  src={product.imageUrl || '/placeholder.png'}
+                  alt={product.name}
+                  fill
+                  sizes="(max-width: 768px) 100vw, 33vw"
+                  className="object-cover"
+                />
+              </div>
 
-            {/* ⚠️ AREA BARU: Promo Banners (Tambahkan di sini) */}
-            <PromoBanners />
-
-            {/* Area 1.B: Daftar Produk Terbaru (KODE LAMA) */}
-            <h2 className="text-2xl font-bold mt-10 mb-6 text-darkgray">Produk Terbaru Untukmu</h2>
-
-            {/* Daftar Produk (Gaya Baru) */}
-            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-              {products.map((product: Product) => (
-                // Panggil komponen ProductCard untuk setiap produk
-                <ProductCard key={product.id} product={product} />
-              ))}
-            </div>
-
-            {products.length === 0 && (
-              <p className="text-center text-gray-500 mt-10">Belum ada produk yang tersedia.</p>
-            )}
-          </div>
-
+              {/* Detail Produk */}
+              <div className="p-4">
+                <h2 className="text-lg font-semibold truncate">{product.name}</h2>
+                <p className="text-xl font-bold text-green-700 mt-1">
+                  Rp{product.price.toLocaleString('id-ID')}
+                </p>
+                <p className="text-sm text-gray-500 mt-2">
+                  Toko: {product.store.name}
+                </p>
+              </div>
+            </Link>
+          ))}
         </div>
+
+        {products.length === 0 && (
+          <p className="text-center text-gray-500 mt-10">Belum ada produk yang tersedia.</p>
+        )}
       </div>
+
     </div>
   );
 }
-

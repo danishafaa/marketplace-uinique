@@ -7,7 +7,6 @@ import Link from 'next/link';
 
 export const dynamic = 'force-dynamic'; // Selalu render dinamis
 
-// Ganti seluruh fungsi getUserDashboardData dengan kode ini
 async function getUserDashboardData() {
     const supabase = await createSupabaseServerClient();
     const { data: { session } } = await supabase.auth.getSession();
@@ -38,7 +37,6 @@ async function getUserDashboardData() {
         userEmail: session.user.email // userEmail bisa null jika email belum diverifikasi
     };
 }
-
 
 export default async function DashboardPage() {
     const { profile, userEmail } = await getUserDashboardData();
