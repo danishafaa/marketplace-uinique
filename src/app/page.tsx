@@ -3,7 +3,6 @@
 import { prisma } from '@/lib/prisma';
 import Link from 'next/link';
 import Image from 'next/image';
-import HeroSection from '@/components/HeroSection'; // <-- Import HeroSection
 
 // Definisikan tipe untuk product (sudah ada)
 interface Product {
@@ -34,9 +33,6 @@ export default async function HomePage() {
   return (
     // Wrap utama
     <div className="flex flex-col min-h-screen">
-
-      {/* 1. HERO SECTION DENGAN BANNER DAN KATEGORI */}
-      <HeroSection />
 
       {/* 2. AREA DAFTAR PRODUK */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 flex-grow w-full">
