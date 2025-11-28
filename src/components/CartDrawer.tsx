@@ -8,6 +8,7 @@ export default function CartDrawer({ isOpen, onClose }: { isOpen: boolean, onClo
     // Gunakan useEffect untuk memuat item keranjang jika diperlukan
     // ...
 
+    // Tambahkan return JSX ini di CartDrawer.tsx:
     return (
         <>
             {/* Overlay Gelap */}

@@ -1,9 +1,11 @@
-// src/app/products/[id]/page.tsx
+// src/app/products/[id]/page.tsx (KODE AKHIR)
 
 import { prisma } from '@/lib/prisma';
 import Image from 'next/image';
 import { notFound } from 'next/navigation';
-import BuyButton from './BuyButton'; // BuyButton dipertahankan
+import BuyButton from './BuyButton';
+import { addItemToCart } from '@/app/actions/cart'; // <-- Import Logic Cart
+import { startConversation } from '@/app/actions/chat'; // <-- Import Logic Chat
 
 // Dapatkan ID dari URL params
 interface ProductDetailPageProps {
@@ -23,12 +25,15 @@ export default async function ProductDetailPage({ params }: ProductDetailPagePro
         notFound(); // Tampilkan halaman 404 jika produk tidak ditemukan
     }
 
-    // Format Harga untuk tampilan (DIAMBIL DARI LOGIKA LAMA)
+    // Format Harga untuk tampilan
     const formattedPrice = product.price.toLocaleString('id-ID', {
         style: 'currency',
         currency: 'IDR',
         minimumFractionDigits: 0,
     });
+
+    // Ambil ID Penjual
+    const sellerId = product.store.profileId;
 
     return (
         // 1. WRAPPER UTAMA DENGAN WARNA BARU
@@ -69,13 +74,59 @@ export default async function ProductDetailPage({ params }: ProductDetailPagePro
                             <span className="text-sm text-gray-500">(Stok Tersedia)</span>
                         </div>
 
-                        {/* Tombol Pembelian (BuyButton) */}
-                        <div className="pt-4 border-t">
-                            <BuyButton
-                                productId={product.id}
-                                productPrice={product.price}
-                            />
+                        {/* Tombol Aksi Utama (Buy Now & Add to Cart) */}
+                        <div className="pt-4 border-t flex space-x-4">
+                            {/* Tombol 1: Buy Now (BuyButton Component) */}
+                            <div className="flex-1">
+                                <BuyButton
+                                    productId={product.id}
+                                    productPrice={product.price}
+                                />
+                            </div>
+
+                            {/* Tombol 2: Tambah ke Keranjang (Server Action) */}
+                            <form action={async (formData: FormData) => {
+                                'use server';
+                                const result = await addItemToCart(product.id, 1);
+
+                                if (result.success) {
+                                    alert('Item berhasil ditambahkan ke keranjang!');
+                                    // TODO: Ganti alert dengan logika Client Component untuk membuka Cart Drawer
+                                } else {
+                                    alert(result.message || 'Gagal menambahkan item.');
+                                }
+                            }}>
+                                <button
+                                    type="submit"
+                                    className="bg-tertiary text-darkgray p-4 rounded-lg shadow-md hover:bg-tertiary-dark transition font-bold"
+                                >
+                                    🛒 Tambah
+                                </button>
+                            </form>
                         </div>
+
+                        {/* Tombol 3: CHAT DENGAN PENJUAL */}
+                        {sellerId && (
+                            <form action={async () => {
+                                'use server';
+                                const result = await startConversation(sellerId);
+
+                                if (result.success) {
+                                    alert(`Chat Room ID: ${result.roomId}. Percakapan berhasil dibuat/ditemukan.`);
+                                    // TODO: Ganti alert dengan logika Client Component untuk membuka Chat Drawer
+                                } else {
+                                    alert(result.message);
+                                }
+                            }}>
+                                <button
+                                    type="submit"
+                                    className="w-full mt-4 bg-primary-light text-primary-dark p-3 rounded-lg shadow-sm hover:bg-primary transition font-semibold"
+                                >
+                                    💬 Chat dengan Penjual
+                                </button>
+                            </form>
+                        )}
+
 
                         {/* Deskripsi Singkat */}
                         <div className="pt-6 border-t">

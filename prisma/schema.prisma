@@ -23,6 +23,10 @@ model Profile {
   store     Store?    // Relasi 1-ke-1 ke Toko
   orders    Order[]   // Relasi 1-ke-banyak sebagai Pembeli
   cart      Cart? //
+  // --- Relasi Messaging Baru ---
+  boughtRooms ChatRoom[] @relation(name: "BuyerRooms")
+  soldRooms   ChatRoom[] @relation(name: "SellerRooms")
+  sentMessages Message[] @relation(name: "SentMessages")
 }
 
 // Model 2: Store (Toko/Penjual)
@@ -93,4 +97,33 @@ model CartItem {
   quantity  Int       @default(1)
   // Harga unit saat item ditambahkan (untuk mencatat harga saat itu)
   price     Int       
+}
+
+// --- Model Messaging Baru ---
+
+model ChatRoom {
+  id        String    @id @default(cuid())
+  // ID Pembeli (yang memulai/berpartisipasi)
+  buyerId   String
+  buyer     Profile   @relation(fields: [buyerId], references: [id], name: "BuyerRooms") 
+  
+  // ID Penjual (Pemilik Toko)
+  sellerId  String
+  seller    Profile   @relation(fields: [sellerId], references: [id], name: "SellerRooms")
+
+  createdAt DateTime  @default(now())
+  messages  Message[] // Relasi ke isi pesan
+}
+
+model Message {
+  id        String    @id @default(cuid())
+  roomId    String
+  room      ChatRoom  @relation(fields: [roomId], references: [id])
+  
+  // ID pengirim (bisa buyerId atau sellerId)
+  senderId  String
+  sender    Profile   @relation(fields: [senderId], references: [id], name: "SentMessages") 
+
+  content   String
+  createdAt DateTime  @default(now())
 }
