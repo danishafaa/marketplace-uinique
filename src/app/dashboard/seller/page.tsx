@@ -12,13 +12,14 @@ async function getUserDashboardData() {
     const { data: { session } } = await supabase.auth.getSession();
 
     if (!session) {
+        // Middleware seharusnya menangani ini, tapi kita double-check
         redirect('/login');
     }
 
     // Ambil Profile dan Store
     const profile = await prisma.profile.findUnique({
         where: { id: session.user.id },
-        select: {
+        select: { // Menggunakan SELECT untuk menghindari Prisma Conflict
             name: true,
             email: true,
             isSeller: true,
@@ -42,6 +43,7 @@ export default async function DashboardPage() {
 
     const isSeller = profile.isSeller;
     const storeName = profile.store?.name || 'Belum Ada Toko';
+    // Menggunakan optional chaining untuk display name yang aman
     const displayUserName = profile.name || userEmail?.split('@')[0] || 'Pengguna';
 
 
@@ -98,7 +100,7 @@ export default async function DashboardPage() {
     );
 }
 
-// Komponen Card sederhana
+// Komponen Card sederhana (Perlu didefinisikan di sini atau dibuat file terpisah)
 function DashboardCard({ title, description, href, icon }: { title: string, description: string, href: string, icon: string }) {
     return (
         <Link href={href} className="block bg-secondary p-5 rounded-lg shadow hover:shadow-xl transition duration-300 border border-gray-200">
