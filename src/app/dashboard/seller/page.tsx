@@ -5,7 +5,7 @@ import { createSupabaseServerClient } from '@/utils/supabase/server';
 import { redirect } from 'next/navigation';
 import Link from 'next/link';
 
-export const dynamic = 'force-dynamic'; // Selalu render dinamis
+export const dynamic = 'force-dynamic';
 
 async function getUserDashboardData() {
     const supabase = await createSupabaseServerClient();
@@ -15,49 +15,50 @@ async function getUserDashboardData() {
         redirect('/login');
     }
 
-    // Ambil Profile dan Store (JANGAN gunakan include: { store: true })
+    // Ambil Profile dan Store
     const profile = await prisma.profile.findUnique({
         where: { id: session.user.id },
-        select: { // <-- HANYA GUNAKAN SELECT
+        select: {
             name: true,
             email: true,
             isSeller: true,
-            // Nested select untuk Store, hanya mengambil nama
-            store: { select: { name: true } },
+            store: { select: { name: true, profileId: true } },
         }
     });
 
     if (!profile) {
-        // Jika ada sesi tapi profile tidak ditemukan
         redirect('/login');
     }
 
     return {
         profile,
-        userEmail: session.user.email // userEmail bisa null jika email belum diverifikasi
+        userEmail: session.user.email
     };
 }
+
 
 export default async function DashboardPage() {
     const { profile, userEmail } = await getUserDashboardData();
 
     const isSeller = profile.isSeller;
     const storeName = profile.store?.name || 'Belum Ada Toko';
+    const displayUserName = profile.name || userEmail?.split('@')[0] || 'Pengguna';
+
 
     return (
         <div className="max-w-4xl mx-auto p-8">
-            <h1 className="text-4xl font-extrabold mb-6">Halo, {profile.name || userEmail?.split('@')[0] || 'Pengguna'}</h1>
+            <h1 className="text-4xl font-extrabold mb-6 text-darkgray">Halo, {displayUserName}</h1>
             <p className="text-gray-600 mb-8">Selamat datang di Pusat Dashboard Anda.</p>
 
             {/* --- Kartu Status Seller --- */}
-            <div className="bg-white p-6 rounded-lg shadow-lg border-l-4 border-orange-500 mb-8">
-                <h2 className="text-2xl font-bold mb-4">Status Penjual</h2>
+            <div className="bg-white p-6 rounded-lg shadow-lg border-l-4 border-primary-dark mb-8">
+                <h2 className="text-2xl font-bold mb-4 text-darkgray">Status Penjual</h2>
 
                 {isSeller ? (
                     <>
                         <p className="text-green-600 font-semibold mb-3">✅ Akun Penjual Aktif</p>
                         <p className="text-gray-700">Toko Anda: {storeName}</p>
-                        <Link href="/dashboard/seller/products" className="mt-4 inline-block bg-orange-500 text-white py-2 px-4 rounded hover:bg-orange-600 transition">
+                        <Link href="/dashboard/seller/products" className="mt-4 inline-block bg-primary-dark text-white py-2 px-4 rounded hover:bg-primary transition">
                             Kelola Produk
                         </Link>
                     </>
@@ -65,7 +66,7 @@ export default async function DashboardPage() {
                     <>
                         <p className="text-red-500 font-semibold mb-3">❌ Belum Terdaftar sebagai Penjual</p>
                         <p className="text-gray-700">Tingkatkan akun Anda untuk mulai berjualan!</p>
-                        <Link href="/dashboard/seller/setup" className="mt-4 inline-block bg-blue-500 text-white py-2 px-4 rounded hover:bg-blue-600 transition">
+                        <Link href="/dashboard/seller/setup" className="mt-4 inline-block bg-tertiary text-darkgray py-2 px-4 rounded hover:bg-tertiary-dark transition">
                             Daftar Jadi Penjual Sekarang
                         </Link>
                     </>
@@ -89,7 +90,7 @@ export default async function DashboardPage() {
                 <DashboardCard
                     title="Keluar (Logout)"
                     description="Akhiri sesi Anda."
-                    href="/logout" // Route ini perlu dibuat, atau gunakan action di Client Component
+                    href="/logout"
                     icon="➡️"
                 />
             </div>
@@ -97,12 +98,12 @@ export default async function DashboardPage() {
     );
 }
 
-// Komponen Card sederhana (Tambahkan di bawah atau buat file terpisah)
+// Komponen Card sederhana
 function DashboardCard({ title, description, href, icon }: { title: string, description: string, href: string, icon: string }) {
     return (
-        <Link href={href} className="block bg-gray-50 p-5 rounded-lg shadow hover:shadow-xl transition duration-300">
+        <Link href={href} className="block bg-secondary p-5 rounded-lg shadow hover:shadow-xl transition duration-300 border border-gray-200">
             <span className="text-2xl mb-2 block">{icon}</span>
-            <h3 className="text-xl font-semibold mb-1">{title}</h3>
+            <h3 className="text-xl font-semibold mb-1 text-darkgray">{title}</h3>
             <p className="text-sm text-gray-600">{description}</p>
         </Link>
     )
