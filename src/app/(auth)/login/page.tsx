@@ -29,7 +29,7 @@ export default function LoginPage() {
     }
 
     const handleSignIn = async () => {
-        const supabase = createSupabaseClient(); // Inisialisasi di dalam handler
+        const supabase = createSupabaseClient();
         setMessage('Processing...')
         const { error } = await supabase.auth.signInWithPassword({
             email,
@@ -41,9 +41,8 @@ export default function LoginPage() {
         } else {
             setMessage('Signed in successfully! Redirecting...')
 
-            // 3. TAMBAHKAN REDIRECT INI:
-            // Arahkan ke halaman setup toko setelah login berhasil
-            router.push('/dashboard/seller/setup')
+            // PERBAIKAN: Arahkan ke Dashboard Hub utama, BUKAN langsung ke Seller Setup
+            router.push('/dashboard')
         }
     }
 
