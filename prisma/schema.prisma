@@ -23,6 +23,7 @@ model Profile {
   store     Store?    // Relasi 1-ke-1 ke Toko
   orders    Order[]   // Relasi 1-ke-banyak sebagai Pembeli
   cart      Cart? //
+  wishlist  Wishlist? @relation(name: "UserWishlist")
   // --- Relasi Messaging Baru ---
   boughtRooms ChatRoom[] @relation(name: "BuyerRooms")
   soldRooms   ChatRoom[] @relation(name: "SellerRooms")
@@ -52,6 +53,7 @@ model Product {
   createdAt DateTime @default(now()) 
   updatedAt DateTime @updatedAt
   cartItems   CartItem[] // Relasi balik ke CartItem yang baru dibuat
+  wishlistItems WishlistItem[]
 }
 
 // Model 4 & 5: Order & OrderItem
@@ -126,4 +128,26 @@ model Message {
 
   content   String
   createdAt DateTime  @default(now())
+}
+// --- Model Favorit (Wishlist) Baru ---
+
+model Wishlist {
+  id        String    @id @default(cuid())
+  // Menghubungkan wishlist ke Profile pembeli (satu wishlist per pembeli)
+  buyerId   String    @unique 
+  buyer     Profile   @relation(fields: [buyerId], references: [id], name: "UserWishlist")
+  createdAt DateTime  @default(now())
+  items     WishlistItem[]
+}
+
+model WishlistItem {
+  id          String    @id @default(cuid())
+  wishlistId  String
+  wishlist    Wishlist  @relation(fields: [wishlistId], references: [id])
+  productId   String
+  product     Product   @relation(fields: [productId], references: [id])
+  createdAt   DateTime  @default(now())
+  
+  // Kombinasi wishlistId dan productId harus unik
+  @@unique([wishlistId, productId]) 
 }
