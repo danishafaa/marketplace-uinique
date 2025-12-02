@@ -1,11 +1,13 @@
-// src/app/products/[id]/page.tsx (KODE AKHIR)
+// src/app/products/[id]/page.tsx
 
 import { prisma } from '@/lib/prisma';
 import Image from 'next/image';
 import { notFound } from 'next/navigation';
 import BuyButton from './BuyButton';
-import { addItemToCart } from '@/app/actions/cart'; // <-- Import Logic Cart
-import { startConversation } from '@/app/actions/chat'; // <-- Import Logic Chat
+import { addItemToCart } from '@/app/actions/cart'; // Logic Cart
+import { startConversation } from '@/app/actions/chat'; // Logic Chat
+import { toggleWishlist } from '@/app/actions/wishlist'; // Logic Wishlist
+import FavoriteButton from '@/components/FavoriteButton'; // Tombol Favorit
 
 // Dapatkan ID dari URL params
 interface ProductDetailPageProps {
@@ -15,14 +17,21 @@ interface ProductDetailPageProps {
 }
 
 export default async function ProductDetailPage({ params }: ProductDetailPageProps) {
-    // Ambil produk dan Store-nya
+    // Ambil produk dan Store-nya, termasuk status Wishlist user saat ini (jika login)
     const product = await prisma.product.findUnique({
         where: { id: params.id },
-        include: { store: true },
+        include: {
+            store: { select: { name: true, profileId: true } },
+            // Cek apakah produk ini ada di wishlist user yang login
+            wishlistItems: {
+                where: { wishlist: { buyer: { id: (await prisma.profile.findFirst({ select: { id: true } }))?.id } } },
+                select: { id: true }
+            }
+        },
     });
 
     if (!product) {
-        notFound(); // Tampilkan halaman 404 jika produk tidak ditemukan
+        notFound();
     }
 
     // Format Harga untuk tampilan
@@ -32,15 +41,14 @@ export default async function ProductDetailPage({ params }: ProductDetailPagePro
         minimumFractionDigits: 0,
     });
 
-    // Ambil ID Penjual
+    // Ambil ID Penjual dan status favorit awal
     const sellerId = product.store.profileId;
+    const isFavoriteInitial = product.wishlistItems.length > 0;
 
     return (
-        // 1. WRAPPER UTAMA DENGAN WARNA BARU
         <div className="bg-lightgray min-h-screen">
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
 
-                {/* KONTEN UTAMA DENGAN SHADOW DAN BACKGROUND PUTIH */}
                 <div className="bg-white p-8 rounded-xl shadow-2xl grid grid-cols-1 lg:grid-cols-2 gap-12">
 
                     {/* Sisi Kiri: Gambar Produk Utama */}
@@ -53,6 +61,10 @@ export default async function ProductDetailPage({ params }: ProductDetailPagePro
                             className="object-cover"
                             priority
                         />
+                        {/* Tombol Favorit di sudut gambar */}
+                        <div className="absolute top-4 right-4 z-10 bg-white rounded-full shadow-lg">
+                            <FavoriteButton productId={product.id} isFavoriteInitial={isFavoriteInitial} />
+                        </div>
                     </div>
 
                     {/* Sisi Kanan: Detail Produk & Aksi */}
@@ -91,7 +103,6 @@ export default async function ProductDetailPage({ params }: ProductDetailPagePro
 
                                 if (result.success) {
                                     alert('Item berhasil ditambahkan ke keranjang!');
-                                    // TODO: Ganti alert dengan logika Client Component untuk membuka Cart Drawer
                                 } else {
                                     alert(result.message || 'Gagal menambahkan item.');
                                 }
@@ -113,7 +124,6 @@ export default async function ProductDetailPage({ params }: ProductDetailPagePro
 
                                 if (result.success) {
                                     alert(`Chat Room ID: ${result.roomId}. Percakapan berhasil dibuat/ditemukan.`);
-                                    // TODO: Ganti alert dengan logika Client Component untuk membuka Chat Drawer
                                 } else {
                                     alert(result.message);
                                 }
