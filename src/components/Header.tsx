@@ -16,20 +16,22 @@ export default function Header() {
             <div className="bg-[#002b45] text-white px-4 py-3">
                 <div className="max-w-7xl mx-auto flex items-center justify-between gap-4">
 
-                    {/* Sisi Kiri: Menu & Logo */}
+                    {/* Sisi Kiri: Menu & Logo Gambar */}
                     <div className="flex items-center space-x-4">
                         <button className="hover:text-gray-300 transition">
                             <Menu size={32} />
                         </button>
+
                         <Link href="/" className="flex items-center">
-                            {/* Logo UINIQUE sesuai desain */}
-                            <span className="text-3xl font-black tracking-tighter">UINI</span>
-                            <div className="relative mx-1">
-                                <span className="text-3xl font-black">Q</span>
-                                {/* Aksen keranjang kecil di bawah Q jika ingin custom, 
-                                    atau bisa gunakan logo image jika ada */}
-                            </div>
-                            <span className="text-3xl font-black tracking-tighter">UE</span>
+                            {/* --- GANTI BAGIAN INI DENGAN GAMBAR --- */}
+                            <Image
+                                src="/logo-uinique.png" // Sesuaikan dengan nama file di folder public
+                                alt="UINIQUE Logo"
+                                width={180}  // Sesuaikan lebar logo Anda
+                                height={50}  // Sesuaikan tinggi logo Anda
+                                className="object-contain"
+                                priority      // Agar logo dimuat paling awal
+                            />
                         </Link>
                     </div>
 
