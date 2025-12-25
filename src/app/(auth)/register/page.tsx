@@ -25,7 +25,7 @@ const RegisterPage = () => {
                 {/* Sisi Kanan (Sekarang di kanan untuk variasi): Welcome Back Message */}
                 <div className="w-full md:w-1/2 p-12 flex flex-col justify-center items-center text-center space-y-8 bg-white">
                     <h1 className="text-5xl md:text-6xl font-black text-[#002d4b] tracking-tight">
-                        Join Us!
+                        Hello,Welcome!
                     </h1>
 
                     <div className="space-y-4">
