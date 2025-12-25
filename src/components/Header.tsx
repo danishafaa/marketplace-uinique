@@ -52,12 +52,14 @@ export default function Header() {
 
                     {/* Sisi Kanan: Icons */}
                     <div className="flex items-center space-x-6">
-                        <button className="relative hover:text-sky-300 transition">
+                        {/* Gunakan Link ke /cart */}
+                        <Link href="/cart" className="relative hover:text-sky-300 transition">
                             <ShoppingCart size={32} />
+                            {/* Angka badge bisa diambil dari database/state */}
                             <span className="absolute -top-1 -right-2 bg-red-600 text-[10px] font-bold px-1.5 rounded-full">
                                 0
                             </span>
-                        </button>
+                        </Link>
                         <button className="hover:text-sky-300 transition">
                             <Heart size={32} />
                         </button>

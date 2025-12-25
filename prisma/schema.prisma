@@ -92,14 +92,14 @@ model Cart {
 }
 
 model CartItem {
-  id        String    @id @default(cuid())
+  id        String   @id @default(cuid())
   cartId    String
-  cart      Cart      @relation(fields: [cartId], references: [id])
   productId String
-  product   Product   @relation(fields: [productId], references: [id])
-  quantity  Int       @default(1)
-  // Harga unit saat item ditambahkan (untuk mencatat harga saat itu)
-  price     Int       
+  quantity  Int      @default(1)
+  price     Float    
+  cart      Cart     @relation(fields: [cartId], references: [id])
+  product   Product  @relation(fields: [productId], references: [id])
+  @@unique([cartId, productId])
 }
 
 // --- Model Messaging Baru ---
