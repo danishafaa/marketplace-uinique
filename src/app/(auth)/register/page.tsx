@@ -1,131 +1,128 @@
+// src/app/(auth)/register/page.tsx
 "use client";
 
 import React, { useState } from 'react';
+import Image from 'next/image';
 import Link from 'next/link';
-import { Eye, EyeOff, Mail, Lock, User, ArrowRight } from 'lucide-react';
 
 const RegisterPage = () => {
-    const [showPassword, setShowPassword] = useState(false);
-    const [formData, setFormData] = useState({
-        name: '',
-        email: '',
-        password: '',
-        confirmPassword: ''
-    });
+    // State untuk form (nanti akan dihubungkan ke Supabase)
+    const [email, setEmail] = useState('');
+    const [password, setPassword] = useState('');
+    const [name, setName] = useState('');
 
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
-        // Logic registrasi Anda di sini
-        console.log("Registering with:", formData);
+        console.log("Proses registrasi untuk:", name);
+        // Di sini nanti kita masukkan logic Supabase signUp
     };
 
     return (
-        <div className="min-h-screen flex items-center justify-center bg-gray-50 px-4 py-12">
-            <div className="max-w-md w-full space-y-8 bg-white p-8 rounded-2xl shadow-xl">
-                {/* Header */}
-                <div className="text-center">
-                    <div className="mx-auto h-12 w-12 bg-blue-600 rounded-xl flex items-center justify-center mb-4">
-                        <User className="text-white" size={28} />
+        <div className="min-h-screen bg-[#002d4b] flex items-center justify-center p-4 font-sans">
+            {/* Container Utama */}
+            <div className="bg-white w-full max-w-5xl rounded-[40px] shadow-2xl overflow-hidden flex flex-col md:flex-row-reverse min-h-[550px]">
+
+                {/* Sisi Kanan (Sekarang di kanan untuk variasi): Welcome Back Message */}
+                <div className="w-full md:w-1/2 p-12 flex flex-col justify-center items-center text-center space-y-8 bg-white">
+                    <h1 className="text-5xl md:text-6xl font-black text-[#002d4b] tracking-tight">
+                        Join Us!
+                    </h1>
+
+                    <div className="space-y-4">
+                        <p className="text-[#002d4b] text-lg font-medium">
+                            Already have an account?
+                        </p>
+                        <Link href="/login">
+                            <button className="bg-[#002d4b] text-white px-12 py-3 rounded-xl text-lg font-bold hover:bg-[#00365a] transition-all transform hover:scale-105 shadow-lg uppercase">
+                                Log In
+                            </button>
+                        </Link>
                     </div>
-                    <h2 className="text-3xl font-extrabold text-gray-900">Buat Akun Baru</h2>
-                    <p className="mt-2 text-sm text-gray-600">
-                        Daftar sekarang untuk mulai mengelola produk Anda
-                    </p>
                 </div>
 
-                <form className="mt-8 space-y-6" onSubmit={handleSubmit}>
-                    <div className="space-y-4">
-                        {/* Input Nama */}
-                        <div>
-                            <label className="block text-sm font-medium text-gray-700">Nama Lengkap</label>
-                            <div className="mt-1 relative">
-                                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                                    <User className="h-5 w-5 text-gray-400" />
-                                </div>
+                {/* Sisi Kiri: Register Form */}
+                <div className="w-full md:w-1/2 p-12 flex flex-col justify-center bg-white border-r md:border-gray-100">
+                    <div className="max-w-md mx-auto w-full space-y-6">
+                        <h2 className="text-3xl font-bold text-[#002d4b] mb-4">
+                            Create Account
+                        </h2>
+
+                        <form onSubmit={handleSubmit} className="space-y-4">
+                            {/* Input Full Name */}
+                            <div className="relative">
                                 <input
                                     type="text"
+                                    placeholder="Full Name"
                                     required
-                                    className="block w-full pl-10 pr-3 py-3 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 text-sm"
-                                    placeholder="John Doe"
-                                    onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                                    value={name}
+                                    onChange={(e) => setName(e.target.value)}
+                                    className="w-full bg-[#d9d9d9] border-none rounded-xl py-4 px-6 pr-12 text-gray-700 focus:ring-2 focus:ring-[#002d4b] outline-none transition-all placeholder:text-gray-500"
                                 />
-                            </div>
-                        </div>
-
-                        {/* Input Email */}
-                        <div>
-                            <label className="block text-sm font-medium text-gray-700">Alamat Email</label>
-                            <div className="mt-1 relative">
-                                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                                    <Mail className="h-5 w-5 text-gray-400" />
+                                <div className="absolute right-4 top-1/2 transform -translate-y-1/2 text-gray-600">
+                                    <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="currentColor" viewBox="0 0 24 24">
+                                        <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z" />
+                                    </svg>
                                 </div>
+                            </div>
+
+                            {/* Input Email */}
+                            <div className="relative">
                                 <input
                                     type="email"
+                                    placeholder="Email Address"
                                     required
-                                    className="block w-full pl-10 pr-3 py-3 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 text-sm"
-                                    placeholder="name@company.com"
-                                    onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                                    value={email}
+                                    onChange={(e) => setEmail(e.target.value)}
+                                    className="w-full bg-[#d9d9d9] border-none rounded-xl py-4 px-6 pr-12 text-gray-700 focus:ring-2 focus:ring-[#002d4b] outline-none transition-all placeholder:text-gray-500"
                                 />
-                            </div>
-                        </div>
-
-                        {/* Input Password */}
-                        <div>
-                            <label className="block text-sm font-medium text-gray-700">Password</label>
-                            <div className="mt-1 relative">
-                                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                                    <Lock className="h-5 w-5 text-gray-400" />
+                                <div className="absolute right-4 top-1/2 transform -translate-y-1/2 text-gray-600">
+                                    <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="currentColor" viewBox="0 0 24 24">
+                                        <path d="M20 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4l-8 5-8-5V6l8 5 8-5v2z" />
+                                    </svg>
                                 </div>
-                                <input
-                                    type={showPassword ? "text" : "password"}
-                                    required
-                                    className="block w-full pl-10 pr-10 py-3 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 text-sm"
-                                    placeholder="••••••••"
-                                    onChange={(e) => setFormData({ ...formData, password: e.target.value })}
-                                />
-                                <button
-                                    type="button"
-                                    className="absolute inset-y-0 right-0 pr-3 flex items-center"
-                                    onClick={() => setShowPassword(!showPassword)}
-                                >
-                                    {showPassword ? <EyeOff size={18} className="text-gray-400" /> : <Eye size={18} className="text-gray-400" />}
-                                </button>
                             </div>
+
+                            {/* Input Password */}
+                            <div className="relative">
+                                <input
+                                    type="password"
+                                    placeholder="Password"
+                                    required
+                                    value={password}
+                                    onChange={(e) => setPassword(e.target.value)}
+                                    className="w-full bg-[#d9d9d9] border-none rounded-xl py-4 px-6 pr-12 text-gray-700 focus:ring-2 focus:ring-[#002d4b] outline-none transition-all placeholder:text-gray-500"
+                                />
+                                <div className="absolute right-4 top-1/2 transform -translate-y-1/2 text-gray-600">
+                                    <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="currentColor" viewBox="0 0 24 24">
+                                        <path d="M18 8h-1V6c0-2.76-2.24-5-5-5S7 3.24 7 6v2H6c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V10c0-1.1-.9-2-2-2zm-6 9c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2zm3.1-9H8.9V6c0-1.71 1.39-3.1 3.1-3.1 1.71 0 3.1 1.39 3.1 3.1v2z" />
+                                    </svg>
+                                </div>
+                            </div>
+
+                            <button type="submit" className="w-full bg-[#002d4b] text-white py-4 rounded-xl text-xl font-bold hover:bg-[#00365a] transition-all shadow-md mt-4 uppercase">
+                                Sign Up
+                            </button>
+                        </form>
+
+                        {/* Divider */}
+                        <div className="relative flex items-center py-2">
+                            <div className="flex-grow border-t border-gray-300"></div>
+                            <span className="flex-shrink mx-4 text-gray-500 text-sm font-medium">OR</span>
+                            <div className="flex-grow border-t border-gray-300"></div>
                         </div>
+
+                        {/* Google Register */}
+                        <button type="button" className="w-full bg-[#d9d9d9] text-[#555] py-4 rounded-xl flex items-center justify-center gap-3 font-bold hover:bg-gray-300 transition-all uppercase tracking-wider text-sm">
+                            <Image
+                                src="https://www.gstatic.com/images/branding/product/1x/gsa_512dp.png"
+                                alt="Google"
+                                width={24}
+                                height={24}
+                                className="w-6 h-6"
+                            />
+                            Sign Up with Google
+                        </button>
                     </div>
-
-                    {/* Checkbox Terms */}
-                    <div className="flex items-center">
-                        <input
-                            id="terms"
-                            name="terms"
-                            type="checkbox"
-                            required
-                            className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
-                        />
-                        <label htmlFor="terms" className="ml-2 block text-sm text-gray-700">
-                            Saya setuju dengan <span className="text-blue-600 hover:underline cursor-pointer">Syarat & Ketentuan</span>
-                        </label>
-                    </div>
-
-                    {/* Submit Button */}
-                    <button
-                        type="submit"
-                        className="group relative w-full flex justify-center py-3 px-4 border border-transparent text-sm font-semibold rounded-lg text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-all duration-200"
-                    >
-                        Daftar Akun
-                        <ArrowRight className="ml-2 h-5 w-5 group-hover:translate-x-1 transition-transform" />
-                    </button>
-                </form>
-
-                {/* Footer Link */}
-                <div className="text-center mt-6">
-                    <p className="text-sm text-gray-600">
-                        Sudah punya akun?{' '}
-                        <Link href="/login" className="font-medium text-blue-600 hover:text-blue-500 transition-colors">
-                            Masuk di sini
-                        </Link>
-                    </p>
                 </div>
             </div>
         </div>

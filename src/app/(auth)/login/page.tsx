@@ -1,3 +1,4 @@
+//src>app>(auth)>login>page.tsx
 "use client"; // 1. Penambahan direktif Client Component
 
 import React from 'react';
