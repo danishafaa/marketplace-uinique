@@ -1,4 +1,4 @@
-// src/app/page.tsx
+// src/app/page.tsx/
 
 import { prisma } from '@/lib/prisma';
 import { createSupabaseServerClient } from '@/utils/supabase/server';
