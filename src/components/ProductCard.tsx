@@ -1,12 +1,13 @@
 // src/components/ProductCard.tsx
 
+'use client';
+
 import Link from 'next/link';
 import Image from 'next/image';
-import FavoriteButton from './FavoriteButton';
-import { addItemToCart } from '@/app/actions/cart'; // Mengambil Server Action untuk Cart
+import FavoriteButton from './FavoriteButton'; // Tetap pertahankan fitur Wishlist
+import { addItemToCart } from '@/app/actions/cart'; // Tetap pertahankan fungsi Cart Server Action
 
-// Definisikan tipe untuk product, diambil dari src/app/page.tsx
-// Pastikan ini mencerminkan data yang akan dikirim dari page.tsx
+// Interface disesuaikan dengan data dari Database (page.tsx)
 interface Product {
     id: string;
     name: string;
@@ -15,81 +16,99 @@ interface Product {
     store: {
         name: string;
     };
-    // Menambahkan field yang dibutuhkan untuk wishlist check
     isFavorite: boolean;
+    createdAt?: Date; // Opsional: untuk logika "NEW" badge
 }
 
 export default function ProductCard({ product }: { product: Product }) {
-    // Format harga ke IDR
+    
+    // Logic 1: Format Harga
     const formattedPrice = product.price.toLocaleString('id-ID', {
         style: 'currency',
         currency: 'IDR',
         minimumFractionDigits: 0,
     });
 
-    // Server Action untuk add to cart (Client side handler)
+    // Logic 2: Handle Add to Cart (Mencegah pindah halaman saat klik tombol)
     const handleAddToCart = async (e: React.MouseEvent) => {
-        e.preventDefault();
-        e.stopPropagation();
+        e.preventDefault(); // Mencegah Link terbuka
+        e.stopPropagation(); // Mencegah event bubbling
 
-        const result = await addItemToCart(product.id, 1);
-        if (result.success) {
-            alert('Item berhasil ditambahkan ke keranjang!');
-        } else {
-            alert(result.message);
+        try {
+            const result = await addItemToCart(product.id, 1);
+            if (result.success) {
+                alert('Berhasil masuk keranjang!'); // Bisa diganti Toast nanti
+            } else {
+                alert(result.message);
+            }
+        } catch (error) {
+            console.error(error);
+            alert("Terjadi kesalahan.");
         }
     };
 
-    return (
-        <Link
-            href={`/products/${product.id}`}
-            className="group block bg-secondary border border-gray-200 rounded-xl shadow-md hover:shadow-xl transition-shadow duration-300 overflow-hidden relative"
-        >
+    // Logic 3: Tentukan apakah produk "Baru" (Misal: dibuat dalam 7 hari terakhir)
+    const isNew = product.createdAt 
+        ? (new Date().getTime() - new Date(product.createdAt).getTime()) / (1000 * 3600 * 24) < 7
+        : false;
 
-            {/* Gambar Produk */}
-            <div className="relative w-full h-40 bg-gray-100 overflow-hidden">
+    return (
+        <Link 
+            href={`/products/${product.id}`}
+            className="group block bg-white p-3 rounded-2xl shadow-sm border border-gray-100 hover:shadow-lg transition-all duration-300 relative"
+        >
+            {/* --- BAGIAN GAMBAR --- */}
+            <div className="relative aspect-square mb-3 overflow-hidden rounded-xl bg-gray-50">
                 <Image
                     src={product.imageUrl || '/placeholder.png'}
                     alt={product.name}
                     fill
                     sizes="(max-width: 768px) 50vw, 25vw"
-                    className="object-cover group-hover:scale-105 transition-transform duration-300"
+                    className="object-cover group-hover:scale-105 transition-transform duration-500"
                 />
 
-                {/* LOKASI TOMBOL FAVORIT */}
-                <div className="absolute top-2 right-2 z-10">
-                    <FavoriteButton productId={product.id} isFavoriteInitial={product.isFavorite} />
-                </div>
+                {/* Badge NEW (Visual Baru) */}
+                {isNew && (
+                    <div className="absolute top-3 left-3 bg-black text-white text-[9px] px-2 py-0.5 font-black z-10 rounded-sm tracking-wider">
+                        NEW
+                    </div>
+                )}
 
-                {/* Badge Promosi */}
-                <span className="absolute top-2 left-2 z-10 bg-red-500 text-white text-xs font-bold px-2 py-0.5 rounded-full">
-                    New
-                </span>
+                {/* Tombol Favorit (Logic Lama, Posisi Baru) */}
+                <div className="absolute top-2 right-2 z-10">
+                    {/* Kita bungkus div agar event klik hati tidak memicu link produk */}
+                    <div onClick={(e) => { e.preventDefault(); e.stopPropagation(); }}>
+                        <FavoriteButton productId={product.id} isFavoriteInitial={product.isFavorite} />
+                    </div>
+                </div>
             </div>
 
-            {/* Detail Produk */}
-            <div className="p-4 space-y-1">
-                <p className="text-xs text-gray-500">
-                    Toko: {product.store.name}
-                </p>
-                <h3 className="text-base font-semibold truncate text-darkgray group-hover:text-primary-dark transition-colors">
+            {/* --- BAGIAN TEXT INFO --- */}
+            <div className="px-1">
+                {/* Nama Produk */}
+                <h3 className="text-[13px] font-bold text-gray-900 leading-tight line-clamp-2 min-h-[2.5em]">
                     {product.name}
                 </h3>
 
-                {/* Harga */}
-                <p className="text-xl font-extrabold text-red-600 pt-2">
-                    {formattedPrice}
+                {/* Nama Toko */}
+                <p className="text-[10px] text-gray-400 mt-1 truncate">
+                    {product.store.name}
                 </p>
 
-                {/* Tombol Beli Cepat */}
-                <button
-                    type="button"
-                    onClick={handleAddToCart}
-                    className="w-full mt-3 bg-tertiary text-darkgray font-bold py-2 rounded-lg opacity-0 group-hover:opacity-100 transition-opacity duration-300"
-                >
-                    + Tambah
-                </button>
+                {/* Harga (Style Baru) */}
+                <p className="text-[11px] text-gray-600 mt-1 font-medium">
+                    Price: <span className="text-[#002b45] font-bold">{formattedPrice}</span>
+                </p>
             </div>
+
+            {/* --- TOMBOL ADD TO CART (Style Baru: Navy Pill) --- */}
+            <button
+                type="button"
+                onClick={handleAddToCart}
+                className="mt-3 w-full bg-[#002b45] text-white text-[10px] py-2 rounded-full font-bold hover:bg-[#001a2b] active:scale-95 transition-all shadow-sm"
+            >
+                Add to Cart
+            </button>
         </Link>
     );
 }
