@@ -1,27 +1,28 @@
-import Image from 'next/image';
+// src/components/CategorySection.tsx
+import React from 'react';
+import Link from 'next/link';
 
 const categories = [
-  { name: 'Food', icon: '/icons/food.png' },
-  { name: 'Drink', icon: '/icons/drink.png' },
-  { name: 'Service', icon: '/icons/service.png' },
-  { name: 'Stationery', icon: '/icons/stationery.png' },
+    { name: 'Food', icon: '🍲', href: '/category/food' },
+    { name: 'Drink', icon: '🥤', href: '/category/drink' },
+    { name: 'Service', icon: '⚙️', href: '/category/service' },
+    { name: 'Stationery', icon: '✏️', href: '/category/stationery' },
 ];
 
 export default function CategorySection() {
-  return (
-    <div className="py-8 text-center">
-      <p className="text-sm font-bold text-gray-600 mb-6">Browse by Category</p>
-      <div className="flex justify-center space-x-8">
-        {categories.map((cat) => (
-          <div key={cat.name} className="flex flex-col items-center group cursor-pointer">
-            <div className="w-16 h-16 bg-white shadow-md rounded-2xl flex items-center justify-center border border-gray-100 group-hover:shadow-xl transition">
-              {/* Ganti dengan icon yang sesuai */}
-              <span className="text-2xl">📦</span> 
+    return (
+        <div className="py-8 flex flex-col items-center">
+            <p className="text-sm font-bold text-gray-400 mb-6 uppercase tracking-widest">Browse by Category</p>
+            <div className="flex flex-wrap justify-center gap-10">
+                {categories.map((cat) => (
+                    <Link key={cat.name} href={cat.href} className="group flex flex-col items-center cursor-pointer">
+                        <div className="w-16 h-16 bg-white shadow-md rounded-2xl flex items-center justify-center border border-gray-100 group-hover:shadow-xl group-hover:-translate-y-1 transition-all duration-300">
+                            <span className="text-3xl">{cat.icon}</span>
+                        </div>
+                        <span className="text-[11px] font-bold mt-3 text-gray-700 uppercase group-hover:text-[#002b45]">{cat.name}</span>
+                    </Link>
+                ))}
             </div>
-            <span className="text-xs font-semibold mt-2 text-gray-700">{cat.name}</span>
-          </div>
-        ))}
-      </div>
-    </div>
-  );
+        </div>
+    );
 }

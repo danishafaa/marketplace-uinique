@@ -21,7 +21,7 @@ interface Product {
 }
 
 export default function ProductCard({ product }: { product: Product }) {
-    
+
     // Logic 1: Format Harga
     const formattedPrice = product.price.toLocaleString('id-ID', {
         style: 'currency',
@@ -48,12 +48,12 @@ export default function ProductCard({ product }: { product: Product }) {
     };
 
     // Logic 3: Tentukan apakah produk "Baru" (Misal: dibuat dalam 7 hari terakhir)
-    const isNew = product.createdAt 
+    const isNew = product.createdAt
         ? (new Date().getTime() - new Date(product.createdAt).getTime()) / (1000 * 3600 * 24) < 7
         : false;
 
     return (
-        <Link 
+        <Link
             href={`/products/${product.id}`}
             className="group block bg-white p-3 rounded-2xl shadow-sm border border-gray-100 hover:shadow-lg transition-all duration-300 relative"
         >
