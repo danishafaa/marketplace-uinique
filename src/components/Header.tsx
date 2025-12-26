@@ -74,7 +74,7 @@ export default function Header() {
             <div className="bg-[#9dc3e6] py-2 px-6">
                 <div className="max-w-7xl mx-auto">
                     <nav className="flex items-center space-x-10 text-[#002b45] font-semibold text-sm">
-                        <Link href="/products" className="hover:underline transition">
+                        <Link href="/all-products" className="hover:text-[#002b45] transition-colors">
                             Product
                         </Link>
                         <Link href="/promo" className="hover:underline transition">

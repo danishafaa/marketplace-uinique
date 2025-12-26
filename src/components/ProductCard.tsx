@@ -22,7 +22,7 @@ export default function ProductCard({ product }: ProductProps) {
         try {
             const result = await addItemToCart(product.id, 1);
             alert(result.success ? 'Berhasil masuk keranjang!' : result.message);
-        } catch (err) {
+        } catch {
             alert("Harap login terlebih dahulu.");
         }
     };
