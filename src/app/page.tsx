@@ -96,7 +96,7 @@ export default async function HomePage() {
             <h2 className="text-xl font-black text-[#002b45] italic uppercase tracking-tighter">
               Best Seller
             </h2>
-            <Link href="/products" className="text-xs font-bold text-gray-400 hover:text-[#002b45]">
+            <Link href="/best-seller" className="text-xs font-bold text-gray-400 hover:text-[#002b45]">
               See More &gt;
             </Link>
           </div>
