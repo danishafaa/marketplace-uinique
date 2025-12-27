@@ -1,14 +1,24 @@
 // src/components/Header.tsx
-
 'use client';
 
 import React, { useState } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
+import { useRouter } from 'next/navigation'; // Untuk fungsi search
 import { Menu, Search, ShoppingCart, Heart, User } from 'lucide-react';
 
 export default function Header() {
-    const [isCartOpen, setIsCartOpen] = useState(false);
+    const router = useRouter();
+    const [searchQuery, setSearchQuery] = useState("");
+
+    // --- LOGIKA PENCARIAN ---
+    const handleSearch = (e: React.FormEvent) => {
+        e.preventDefault(); // Mencegah reload halaman
+        if (searchQuery.trim()) {
+            // Arahkan ke halaman All Products dengan kata kunci
+            router.push(`/all-products?search=${encodeURIComponent(searchQuery)}`);
+        }
+    };
 
     return (
         <header className="sticky top-0 z-50 shadow-md">
@@ -23,47 +33,57 @@ export default function Header() {
                         </button>
 
                         <Link href="/" className="flex items-center">
-                            {/* --- GANTI BAGIAN INI DENGAN GAMBAR --- */}
                             <Image
-                                src="/logo-uinique.png" // Sesuaikan dengan nama file di folder public
+                                src="/logo-uinique.png" // Pastikan file ini ada di public/
                                 alt="UINIQUE Logo"
-                                width={180}  // Sesuaikan lebar logo Anda
-                                height={50}  // Sesuaikan tinggi logo Anda
+                                width={140}
+                                height={40}
                                 className="object-contain"
-                                priority      // Agar logo dimuat paling awal
+                                priority
                             />
                         </Link>
                     </div>
 
-                    {/* Tengah: Search Bar Bulat */}
-                    <div className="flex-grow max-w-2xl relative">
+                    {/* Tengah: Search Bar Bulat (SEKARANG BERFUNGSI) */}
+                    <form onSubmit={handleSearch} className="flex-grow max-w-2xl relative hidden md:block">
                         <div className="relative flex items-center">
                             <input
                                 type="text"
-                                placeholder="Search...."
+                                placeholder="Search products..."
+                                value={searchQuery}
+                                onChange={(e) => setSearchQuery(e.target.value)}
                                 className="w-full py-2.5 px-12 rounded-full text-gray-800 focus:outline-none focus:ring-2 focus:ring-sky-400"
                             />
-                            <Search
-                                className="absolute left-4 text-gray-500"
-                                size={24}
-                            />
+                            {/* Tombol Search Icon bisa diklik */}
+                            <button type="submit" className="absolute left-4 text-gray-500 hover:text-[#002b45]">
+                                <Search size={24} />
+                            </button>
                         </div>
-                    </div>
+                    </form>
 
                     {/* Sisi Kanan: Icons */}
                     <div className="flex items-center space-x-6">
-                        {/* Gunakan Link ke /cart */}
-                        <Link href="/cart" className="relative hover:text-sky-300 transition">
+
+                        {/* 1. Cart Icon */}
+                        <Link href="/cart" className="relative hover:text-sky-300 transition p-1" title="Keranjang">
                             <ShoppingCart size={32} />
-                            {/* Angka badge bisa diambil dari database/state */}
+                            {/* Badge Merah (Statis dulu) */}
                             <span className="absolute -top-1 -right-2 bg-red-600 text-[10px] font-bold px-1.5 rounded-full">
                                 0
                             </span>
                         </Link>
-                        <button className="hover:text-sky-300 transition">
+
+                        {/* 2. Favorite Icon (INI YANG DIPERBAIKI) */}
+                        <Link
+                            href="/favorites"
+                            className="hover:text-pink-400 transition p-1 cursor-pointer"
+                            title="Favorit Saya"
+                        >
                             <Heart size={32} />
-                        </button>
-                        <Link href="/dashboard" className="hover:text-sky-300 transition">
+                        </Link>
+
+                        {/* 3. User Icon */}
+                        <Link href="/login" className="hover:text-sky-300 transition p-1" title="Akun Saya">
                             <User size={32} />
                         </Link>
                     </div>
@@ -74,16 +94,16 @@ export default function Header() {
             <div className="bg-[#9dc3e6] py-2 px-6">
                 <div className="max-w-7xl mx-auto">
                     <nav className="flex items-center space-x-10 text-[#002b45] font-semibold text-sm">
-                        <Link href="/all-products" className="hover:text-[#002b45] transition-colors">
+                        <Link href="/all-products" className="hover:text-white transition-colors">
                             Product
                         </Link>
-                        <Link href="/promo" className="hover:underline transition">
+                        <Link href="/promo" className="hover:text-white transition">
                             Promo
                         </Link>
-                        <Link href="/best-seller" className="hover:underline transition">
-                            Best seller
+                        <Link href="/best-seller" className="hover:text-white transition">
+                            Best Seller
                         </Link>
-                        <Link href="/discount" className="hover:underline transition">
+                        <Link href="/discount" className="hover:text-white transition">
                             Discount
                         </Link>
                     </nav>
