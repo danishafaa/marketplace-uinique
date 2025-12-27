@@ -6,64 +6,99 @@ import { createSupabaseServerClient } from '@/utils/supabase/server';
 import { prisma } from '@/lib/prisma';
 import { revalidatePath } from 'next/cache';
 
-interface WishlistActionResponse {
-    success: boolean;
-    message: string;
-    action?: 'added' | 'removed';
+// --- 1. AMBIL DATA FAVORIT (Untuk Halaman /favorites) ---
+export async function getFavoriteProducts() {
+    const supabase = await createSupabaseServerClient();
+    const { data: { session } } = await supabase.auth.getSession();
+
+    if (!session?.user) return [];
+
+    try {
+        const favorites = await prisma.wishlist.findMany({
+            where: { userId: session.user.id },
+            include: {
+                product: {
+                    include: { store: { select: { name: true } } } // Ambil nama toko juga
+                },
+            },
+            orderBy: { createdAt: 'desc' }
+        });
+
+        // Kembalikan hanya data produknya saja
+        return favorites.map((fav) => fav.product);
+    } catch (error) {
+        console.error("Error fetching wishlist:", error);
+        return [];
+    }
 }
 
-export async function toggleWishlist(productId: string): Promise<WishlistActionResponse> {
+// --- 2. TOGGLE LOVE (Untuk Tombol Hati di Product Card) ---
+export async function toggleWishlist(productId: string) {
     const supabase = await createSupabaseServerClient();
     const { data: { session } } = await supabase.auth.getSession();
 
     if (!session) {
-        return { success: false, message: 'Harap login untuk menambahkan ke daftar favorit.' };
+        return { success: false, message: 'Harap login dahulu.' };
     }
+
     const userId = session.user.id;
 
     try {
-        // 1. Dapatkan atau Buat Wishlist Pengguna
-        let wishlist = await prisma.wishlist.findUnique({
-            where: { buyerId: userId },
-        });
-
-        if (!wishlist) {
-            wishlist = await prisma.wishlist.create({
-                data: { buyerId: userId },
-            });
-        }
-
-        // 2. Cek apakah item sudah ada
-        const existingItem = await prisma.wishlistItem.findUnique({
+        // Cek apakah sudah ada di wishlist
+        const existing = await prisma.wishlist.findUnique({
             where: {
-                wishlistId_productId: { // Menggunakan unique constraint yang kita buat
-                    wishlistId: wishlist.id,
-                    productId: productId,
-                },
-            },
+                userId_productId: {
+                    userId: userId,
+                    productId: productId
+                }
+            }
         });
 
-        if (existingItem) {
-            // Item sudah ada: HAPUS dari wishlist
-            await prisma.wishlistItem.delete({
-                where: { id: existingItem.id },
+        if (existing) {
+            // Jika ada, HAPUS (Unlike)
+            await prisma.wishlist.delete({
+                where: { id: existing.id }
             });
-            revalidatePath('/dashboard/favorites');
-            return { success: true, message: 'Dihapus dari favorit.', action: 'removed' };
+            revalidatePath('/');
+            revalidatePath('/favorites');
+            return { success: true, message: 'Dihapus dari favorit', action: 'removed' };
         } else {
-            // Item belum ada: TAMBAHKAN ke wishlist
-            await prisma.wishlistItem.create({
+            // Jika belum ada, TAMBAH (Like)
+            await prisma.wishlist.create({
                 data: {
-                    wishlistId: wishlist.id,
-                    productId: productId,
-                },
+                    userId: userId,
+                    productId: productId
+                }
             });
-            revalidatePath('/dashboard/favorites');
-            return { success: true, message: 'Ditambahkan ke favorit.', action: 'added' };
+            revalidatePath('/');
+            revalidatePath('/favorites');
+            return { success: true, message: 'Ditambahkan ke favorit', action: 'added' };
         }
+    } catch (error) {
+        console.error("Error toggle wishlist:", error);
+        return { success: false, message: 'Gagal memproses data.' };
+    }
+}
 
-    } catch (error: unknown) {
-        console.error("Wishlist toggle failed:", error);
-        return { success: false, message: 'Gagal memproses favorit.' };
+// --- 3. HAPUS SPESIFIK (Untuk Tombol Sampah) ---
+export async function removeFromWishlist(productId: string) {
+    const supabase = await createSupabaseServerClient();
+    const { data: { session } } = await supabase.auth.getSession();
+
+    if (!session) return { success: false, message: "Unauthorized" };
+
+    try {
+        await prisma.wishlist.delete({
+            where: {
+                userId_productId: {
+                    userId: session.user.id,
+                    productId: productId
+                }
+            }
+        });
+        revalidatePath('/favorites');
+        return { success: true };
+    } catch {
+        return { success: false, message: "Gagal menghapus" };
     }
 }
