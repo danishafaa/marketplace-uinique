@@ -1,15 +1,39 @@
 // src/components/Header.tsx
+// src/components/Header.tsx
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
-import { useRouter } from 'next/navigation'; // Untuk fungsi search
+import { useRouter } from 'next/navigation';
 import { Menu, Search, ShoppingCart, Heart, User } from 'lucide-react';
-
+// Tambahkan import tipe data dari supabase-js di bawah ini:
+import { createSupabaseClient as createClient } from '@/utils/supabase/client';
+import { AuthChangeEvent, Session, User as SupabaseUser } from '@supabase/supabase-js';
 export default function Header() {
     const router = useRouter();
     const [searchQuery, setSearchQuery] = useState("");
+    const [user, setUser] = useState<SupabaseUser | null>(null);
+
+    useEffect(() => {
+        const supabase = createClient();
+
+        // Ambil data user saat pertama kali load
+        const checkUser = async () => {
+            const { data: { user } } = await supabase.auth.getUser();
+            setUser(user);
+        };
+        checkUser();
+
+        // Pantau perubahan status login/logout secara realtime
+        const { data: { subscription } } = supabase.auth.onAuthStateChange(
+            (_event: AuthChangeEvent, session: Session | null) => { // <-- Tambahkan tipe data di sini
+                setUser(session?.user ?? null);
+            }
+        );
+
+        return () => subscription.unsubscribe();
+    }, []);
 
     // --- LOGIKA PENCARIAN ---
     const handleSearch = (e: React.FormEvent) => {
@@ -19,19 +43,16 @@ export default function Header() {
             router.push(`/all-products?search=${encodeURIComponent(searchQuery)}`);
         }
     };
-
     return (
         <header className="sticky top-0 z-50 shadow-md">
             {/* --- BARIS UTAMA (NAVY GELAP) --- */}
             <div className="bg-[#002b45] text-white px-4 py-3">
                 <div className="max-w-7xl mx-auto flex items-center justify-between gap-4">
-
                     {/* Sisi Kiri: Menu & Logo Gambar */}
                     <div className="flex items-center space-x-4">
                         <button className="hover:text-gray-300 transition">
                             <Menu size={32} />
                         </button>
-
                         <Link href="/" className="flex items-center">
                             <Image
                                 src="/logo-uinique.png" // Pastikan file ini ada di public/
@@ -43,7 +64,6 @@ export default function Header() {
                             />
                         </Link>
                     </div>
-
                     {/* Tengah: Search Bar Bulat (SEKARANG BERFUNGSI) */}
                     <form onSubmit={handleSearch} className="flex-grow max-w-2xl relative hidden md:block">
                         <div className="relative flex items-center">
@@ -60,10 +80,8 @@ export default function Header() {
                             </button>
                         </div>
                     </form>
-
                     {/* Sisi Kanan: Icons */}
                     <div className="flex items-center space-x-6">
-
                         {/* 1. Cart Icon */}
                         <Link href="/cart" className="relative hover:text-sky-300 transition p-1" title="Keranjang">
                             <ShoppingCart size={32} />
@@ -72,7 +90,6 @@ export default function Header() {
                                 0
                             </span>
                         </Link>
-
                         {/* 2. Favorite Icon (INI YANG DIPERBAIKI) */}
                         <Link
                             href="/favorites"
@@ -81,15 +98,21 @@ export default function Header() {
                         >
                             <Heart size={32} />
                         </Link>
-
                         {/* 3. User Icon */}
-                        <Link href="/login" className="hover:text-sky-300 transition p-1" title="Akun Saya">
-                            <User size={32} />
-                        </Link>
+                        {user ? (
+                            // Jika SUDAH login, arahkan ke /profile
+                            <Link href="/profile" className="hover:text-sky-300 transition p-1" title="Profil Saya">
+                                <User size={32} className="text-sky-400" />
+                            </Link>
+                        ) : (
+                            // Jika BELUM login, arahkan ke /login
+                            <Link href="/login" className="hover:text-sky-300 transition p-1" title="Masuk">
+                                <User size={32} />
+                            </Link>
+                        )}
                     </div>
                 </div>
             </div>
-
             {/* --- BARIS KEDUA (SUB-NAVBAR BIRU MUDA) --- */}
             <div className="bg-[#9dc3e6] py-2 px-6">
                 <div className="max-w-7xl mx-auto">

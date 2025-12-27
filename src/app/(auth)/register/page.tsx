@@ -4,34 +4,37 @@
 import React, { useState } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
+import { registerUser } from '@/app/actions/auth'; // Import mesinnya
 
 const RegisterPage = () => {
-    // State untuk form (nanti akan dihubungkan ke Supabase)
-    const [email, setEmail] = useState('');
-    const [password, setPassword] = useState('');
-    const [name, setName] = useState('');
+    const [isLoading, setIsLoading] = useState(false);
+    const [errorMessage, setErrorMessage] = useState("");
 
-    const handleSubmit = (e: React.FormEvent) => {
-        e.preventDefault();
-        console.log("Proses registrasi untuk:", name);
-        // Di sini nanti kita masukkan logic Supabase signUp
+    // Kita gunakan client-side handling untuk menampilkan loading state
+    const clientAction = async (formData: FormData) => {
+        setIsLoading(true);
+        setErrorMessage("");
+
+        const result = await registerUser(formData);
+
+        // Jika ada error (misal email sudah terdaftar)
+        if (result?.success === false) {
+            setErrorMessage(result.message);
+            setIsLoading(false);
+        }
     };
 
     return (
         <div className="min-h-screen bg-[#002d4b] flex items-center justify-center p-4 font-sans">
-            {/* Container Utama */}
             <div className="bg-white w-full max-w-5xl rounded-[40px] shadow-2xl overflow-hidden flex flex-col md:flex-row-reverse min-h-[550px]">
 
-                {/* Sisi Kanan (Sekarang di kanan untuk variasi): Welcome Back Message */}
+                {/* Sisi Kanan: Welcome Message */}
                 <div className="w-full md:w-1/2 p-12 flex flex-col justify-center items-center text-center space-y-8 bg-white">
                     <h1 className="text-5xl md:text-6xl font-black text-[#002d4b] tracking-tight">
-                        Hello,Welcome!
+                        Hello, Welcome!
                     </h1>
-
                     <div className="space-y-4">
-                        <p className="text-[#002d4b] text-lg font-medium">
-                            Already have an account?
-                        </p>
+                        <p className="text-[#002d4b] text-lg font-medium">Already have an account?</p>
                         <Link href="/login">
                             <button className="bg-[#002d4b] text-white px-12 py-3 rounded-xl text-lg font-bold hover:bg-[#00365a] transition-all transform hover:scale-105 shadow-lg uppercase">
                                 Log In
@@ -43,19 +46,19 @@ const RegisterPage = () => {
                 {/* Sisi Kiri: Register Form */}
                 <div className="w-full md:w-1/2 p-12 flex flex-col justify-center bg-white border-r md:border-gray-100">
                     <div className="max-w-md mx-auto w-full space-y-6">
-                        <h2 className="text-3xl font-bold text-[#002d4b] mb-4">
-                            Create Account
-                        </h2>
+                        <h2 className="text-3xl font-bold text-[#002d4b] mb-4">Create Account</h2>
 
-                        <form onSubmit={handleSubmit} className="space-y-4">
-                            {/* Input Full Name */}
+                        {/* Tampilkan error jika pendaftaran gagal */}
+                        {errorMessage && <p className="text-red-500 text-xs font-bold bg-red-50 p-3 rounded-lg">{errorMessage}</p>}
+
+                        <form action={clientAction} className="space-y-4">
+                            {/* Input Full Name (Gunakan name="fullName" agar terbaca di action) */}
                             <div className="relative">
                                 <input
+                                    name="fullName"
                                     type="text"
                                     placeholder="Full Name"
                                     required
-                                    value={name}
-                                    onChange={(e) => setName(e.target.value)}
                                     className="w-full bg-[#d9d9d9] border-none rounded-xl py-4 px-6 pr-12 text-gray-700 focus:ring-2 focus:ring-[#002d4b] outline-none transition-all placeholder:text-gray-500"
                                 />
                                 <div className="absolute right-4 top-1/2 transform -translate-y-1/2 text-gray-600">
@@ -65,14 +68,13 @@ const RegisterPage = () => {
                                 </div>
                             </div>
 
-                            {/* Input Email */}
+                            {/* Input Email (Gunakan name="email") */}
                             <div className="relative">
                                 <input
+                                    name="email"
                                     type="email"
                                     placeholder="Email Address"
                                     required
-                                    value={email}
-                                    onChange={(e) => setEmail(e.target.value)}
                                     className="w-full bg-[#d9d9d9] border-none rounded-xl py-4 px-6 pr-12 text-gray-700 focus:ring-2 focus:ring-[#002d4b] outline-none transition-all placeholder:text-gray-500"
                                 />
                                 <div className="absolute right-4 top-1/2 transform -translate-y-1/2 text-gray-600">
@@ -82,14 +84,13 @@ const RegisterPage = () => {
                                 </div>
                             </div>
 
-                            {/* Input Password */}
+                            {/* Input Password (Gunakan name="password") */}
                             <div className="relative">
                                 <input
+                                    name="password"
                                     type="password"
                                     placeholder="Password"
                                     required
-                                    value={password}
-                                    onChange={(e) => setPassword(e.target.value)}
                                     className="w-full bg-[#d9d9d9] border-none rounded-xl py-4 px-6 pr-12 text-gray-700 focus:ring-2 focus:ring-[#002d4b] outline-none transition-all placeholder:text-gray-500"
                                 />
                                 <div className="absolute right-4 top-1/2 transform -translate-y-1/2 text-gray-600">
@@ -99,26 +100,25 @@ const RegisterPage = () => {
                                 </div>
                             </div>
 
-                            <button type="submit" className="w-full bg-[#002d4b] text-white py-4 rounded-xl text-xl font-bold hover:bg-[#00365a] transition-all shadow-md mt-4 uppercase">
-                                Sign Up
+                            <button
+                                type="submit"
+                                disabled={isLoading}
+                                className="w-full bg-[#002d4b] text-white py-4 rounded-xl text-xl font-bold hover:bg-[#00365a] transition-all shadow-md mt-4 uppercase disabled:bg-gray-400"
+                            >
+                                {isLoading ? "Creating Account..." : "Sign Up"}
                             </button>
                         </form>
 
-                        {/* Divider */}
                         <div className="relative flex items-center py-2">
                             <div className="flex-grow border-t border-gray-300"></div>
                             <span className="flex-shrink mx-4 text-gray-500 text-sm font-medium">OR</span>
                             <div className="flex-grow border-t border-gray-300"></div>
                         </div>
 
-                        {/* Google Register */}
                         <button type="button" className="w-full bg-[#d9d9d9] text-[#555] py-4 rounded-xl flex items-center justify-center gap-3 font-bold hover:bg-gray-300 transition-all uppercase tracking-wider text-sm">
                             <Image
                                 src="https://www.gstatic.com/images/branding/product/1x/gsa_512dp.png"
-                                alt="Google"
-                                width={24}
-                                height={24}
-                                className="w-6 h-6"
+                                alt="Google" width={24} height={24} className="w-6 h-6"
                             />
                             Sign Up with Google
                         </button>
