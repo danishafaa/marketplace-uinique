@@ -24,8 +24,9 @@ export default async function ProductDetailPage({ params }: ProductDetailPagePro
             wishlistItems: {
                 // Logika pencarian profileId sebaiknya disesuaikan dengan sistem auth Anda (misal: session)
                 // Di sini saya mempertahankan logika asli Anda
-                where: { wishlist: { buyer: { id: (await prisma.profile.findFirst({ select: { id: true } }))?.id } } },
-                select: { id: true }
+                where: {
+                    userId: (await prisma.profile.findFirst({ select: { id: true } }))?.id
+                },
             }
         },
     });
