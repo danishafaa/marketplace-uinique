@@ -9,9 +9,15 @@ export async function addProduct(formData: FormData) {
     const name = formData.get("name") as string;
     const description = formData.get("description") as string;
     const category = formData.get("category") as string;
-    const stock = Number(formData.get("stock")); // Ambil data stok
-    const originalPrice = Number(formData.get("price"));
-    const price = Number(formData.get("discountPrice"));
+    const stock = Number(formData.get("stock"));
+
+    // Perbaikan pengambilan data harga sesuai form baru
+    const originalPrice = Number(formData.get("originalPrice")); // Harga Coret
+    const price = Number(formData.get("price")); // Harga Final (After Discount)
+
+    // Ambil data toggle (nilainya "true" atau "false" string)
+    const isPreOrder = formData.get("preOrder") === "true";
+    // const isDiscount = formData.get("isDiscount") === "true"; // Bisa disimpan jika perlu
 
     const store = await prisma.store.findFirst();
     if (!store) return { success: false, message: "Store tidak ditemukan" };
@@ -24,9 +30,10 @@ export async function addProduct(formData: FormData) {
                 price,
                 originalPrice,
                 category,
-                stock, // Simpan ke database
+                stock,
                 storeId: store.id,
                 imageUrl: "/products/placeholder.jpg",
+                // Anda mungkin perlu menambahkan kolom 'isPreOrder' boolean di schema.prisma nanti
             }
         });
     } catch (error) {
