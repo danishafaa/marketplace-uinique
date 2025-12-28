@@ -5,6 +5,9 @@ import CategorySection from '@/components/CategorySection';
 import ProductCard from '@/components/ProductCard';
 import Image from 'next/image';
 import Link from 'next/link';
+import HeroSection from "@/components/HeroSection";
+import HomeCategoryButtons from "@/components/HomeCategoryButtons";
+import BestSellerSection from "@/components/BestSellerSection";
 
 export const dynamic = 'force-dynamic';
 
@@ -45,21 +48,17 @@ async function getProducts(): Promise<Product[]> {
   }
 }
 
+
 export default async function HomePage() {
   const products = await getProducts();
   const bestSeller = products.slice(0, 6);
 
   return (
-    // Background biru muda agar kontainer putih terlihat menonjol
     <div className="bg-[#f2f7fa] min-h-screen pb-20 font-sans">
-
-      {/* Header TIDAK dipasang di sini agar tidak dobel */}
-
       <main className="max-w-7xl mx-auto px-4 pt-6 space-y-10">
 
-        {/* --- 1. BANNER SECTION (Diperbaiki agar gambar muncul) --- */}
+        {/* --- 1. BANNER SECTION (Tetap Pakai Kode Asli Anda) --- */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4 h-auto md:h-[320px]">
-          {/* Banner Besar: UIN */}
           <div className="md:col-span-2 relative rounded-[40px] overflow-hidden shadow-sm h-[220px] md:h-full">
             <Image
               src="/banner-uin.png"
@@ -73,7 +72,6 @@ export default async function HomePage() {
             </button>
           </div>
 
-          {/* Banner Kecil: Skin Care */}
           <div className="relative rounded-[40px] overflow-hidden shadow-sm h-[220px] md:h-full">
             <Image
               src="/banner-skin.png"
@@ -87,10 +85,11 @@ export default async function HomePage() {
           </div>
         </div>
 
-        {/* --- 2. CATEGORY SECTION --- */}
-        <CategorySection />
+        {/* --- 2. CATEGORY SECTION (DI SINI TEMPATNYA!) --- */}
+        {/* Ganti <CategorySection /> lama dengan komponen ikon baru sesuai desain Langkah 5 */}
+        <HomeCategoryButtons />
 
-        {/* --- 3. BEST SELLER SECTION (Dalam Kotak Putih Bulat) --- */}
+        {/* --- 3. BEST SELLER SECTION (Tetap Pakai Kode Asli Anda) --- */}
         <section className="bg-white rounded-[40px] p-8 md:p-12 shadow-sm border border-gray-50">
           <div className="flex justify-between items-center mb-10">
             <h2 className="text-xl font-black text-[#002b45] italic uppercase tracking-tighter">
@@ -108,7 +107,7 @@ export default async function HomePage() {
           </div>
         </section>
 
-        {/* --- 4. PRODUCT SECTION (Dalam Kotak Putih Bulat) --- */}
+        {/* --- 4. PRODUCT SECTION (Tetap Pakai Kode Asli Anda) --- */}
         <section className="bg-white rounded-[40px] p-8 md:p-12 shadow-sm border border-gray-50">
           <div className="flex justify-between items-center mb-10">
             <h2 className="text-xl font-black text-[#002b45] italic uppercase tracking-tighter">
