@@ -68,6 +68,8 @@ model Product {
   updatedAt DateTime @updatedAt
   cartItems   CartItem[] // Relasi balik ke CartItem yang baru dibuat
   wishlistItems Wishlist[]
+  category      String    @default("Food") 
+  originalPrice Int?
 }
 
 // Model 4 & 5: Order & OrderItem

@@ -1,12 +1,13 @@
 // src/types/product.ts
 export type ProductCategory = "Food" | "Drink" | "Service" | "Stationery";
 
-export interface Product {
-    id: number;
+export type Product = {
+    id: string;             // UBAH DARI number KE string
     name: string;
     price: number;
-    originalPrice?: number; // Untuk harga coret (diskon)
+    originalPrice?: number;
     category: ProductCategory;
     image: string;
-    badge?: "Best Seller"; // Muncul di pojok kiri atas
-}
+    storeName: string;      // Pastikan ada ini untuk nama toko
+    badge?: "Best Seller";
+};
