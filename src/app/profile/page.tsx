@@ -3,8 +3,9 @@ import { createSupabaseServerClient } from "@/utils/supabase/server";
 import { prisma } from "@/lib/prisma";
 import { redirect } from "next/navigation";
 import Image from "next/image";
-// Perbaikan: Hanya impor ikon yang digunakan untuk menghapus warning unused vars
-import { User, Bell, ClipboardList, Ticket, LucideIcon, Link } from "lucide-react";
+import NextLink from 'next/link'; // Ganti nama import agar tidak bentrok
+// Hapus 'Link' dari lucide-react agar tidak membingungkan
+import { User, Bell, ClipboardList, Ticket, LucideIcon } from "lucide-react";
 
 // Perbaikan: Tambahkan interface untuk props SidebarItem agar tidak menggunakan 'any'
 interface SidebarItemProps {
@@ -30,25 +31,27 @@ export default async function ProfilePage() {
                 {/* SIDEBAR */}
                 <aside className="w-full md:w-64 space-y-6">
                     <div className="flex flex-col items-center">
-                        <div className="relative w-24 h-24 rounded-full overflow-hidden border-4 border-white shadow-sm mb-3">
-                            <Image src={profile?.avatarUrl || "/placeholder-user.png"} alt="Avatar" fill className="object-cover" />
+                        <div className="relative w-24 h-24 rounded-full overflow-hidden border-4 border-white shadow-sm mb-4">
+                            <Image
+                                src={profile?.avatarUrl || "/placeholder-user.png"}
+                                alt="Avatar"
+                                fill
+                                className="object-cover"
+                            />
                         </div>
-                        <Link href="/seller/add-product">
-                            <button className="w-full bg-[#002B45] text-white py-3 rounded-xl font-bold hover:bg-[#00365a] transition">
+
+                        {/* TEMPAT MENYISIPKAN TOMBOL START SELLING */}
+                        <NextLink href="/seller/add-product" className="w-full">
+                            <button className="w-full bg-[#002B45] text-white py-3 rounded-xl font-bold hover:bg-[#00365a] transition shadow-sm flex items-center justify-center gap-2">
+                                <span>🛍️</span>
                                 Start Selling
                             </button>
-                        </Link>
+                        </NextLink>
                     </div>
 
                     <nav className="space-y-1">
                         <SidebarItem icon={User} label="My Account" active />
-                        <div className="pl-9 space-y-2 pb-2">
-                            <p className="text-xs text-[#002b45] font-bold cursor-pointer">Profile</p>
-                            <p className="text-xs text-gray-500 cursor-pointer hover:text-[#002b45]">Address</p>
-                            <p className="text-xs text-gray-500 cursor-pointer hover:text-[#002b45]">Change Password</p>
-                            <p className="text-xs text-gray-500 cursor-pointer hover:text-[#002b45]">Notification Settings</p>
-                            <p className="text-xs text-gray-500 cursor-pointer hover:text-[#002b45]">Privacy Settings</p>
-                        </div>
+                        {/* ... menu navigasi lainnya ... */}
                         <SidebarItem icon={ClipboardList} label="My orders" />
                         <SidebarItem icon={Bell} label="Notifications" />
                         <SidebarItem icon={Ticket} label="My Vouchers" />
