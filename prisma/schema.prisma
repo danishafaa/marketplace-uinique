@@ -56,21 +56,40 @@ model Store {
 
 // Model 3: Product
 model Product {
-  id          String    @id @default(cuid())
-  name        String
-  description String
-  price       Int       // Gunakan Integer (sen/rupiah terkecil) untuk menghindari error floating point
-  imageUrl    String?
-  storeId     String
-  store       Store     @relation(fields: [storeId], references: [id])
-  orderItems  OrderItem[]
-  createdAt DateTime @default(now()) 
-  updatedAt DateTime @updatedAt
-  cartItems   CartItem[] // Relasi balik ke CartItem yang baru dibuat
+  // --- FIELD LAMA (DIRETAINKAN) ---
+  id            String      @id @default(cuid())
+  name          String
+  description   String
+  price         Int         // Harga Final (Price After Discount)
+  imageUrl      String?
+  storeId       String
+  store         Store       @relation(fields: [storeId], references: [id])
+  orderItems    OrderItem[]
+  createdAt     DateTime    @default(now()) 
+  updatedAt     DateTime    @updatedAt
+  cartItems     CartItem[] 
   wishlistItems Wishlist[]
-  stock         Int       @default(0)
-  category      String    @default("Food") 
-  originalPrice Int?
+  stock         Int         @default(0)
+  category      String      @default("Food") 
+  originalPrice Int?        // Harga Asli (Price Before Discount)
+
+  // --- FIELD BARU (TAMBAHAN DARI DESAIN GAMBAR 4) ---
+  // Store Information
+  storePhone          String?
+  storeAddress        String?
+
+  // Product Specification
+  shelfLife           String?
+  weight              String?
+  flavor              String?
+  brand               String?
+  packagingType       String?
+  servingInstructions String?
+
+  // Price & Stock Details
+  minOrder            Int       @default(1)
+  isPreOrder          Boolean   @default(false)
+  isDiscount          Boolean   @default(false)
 }
 
 // Model 4 & 5: Order & OrderItem
