@@ -4,7 +4,7 @@ import { prisma } from "@/lib/prisma";
 import { redirect } from "next/navigation";
 import Image from "next/image";
 // Perbaikan: Hanya impor ikon yang digunakan untuk menghapus warning unused vars
-import { User, Bell, ClipboardList, Ticket, LucideIcon } from "lucide-react";
+import { User, Bell, ClipboardList, Ticket, LucideIcon, Link } from "lucide-react";
 
 // Perbaikan: Tambahkan interface untuk props SidebarItem agar tidak menggunakan 'any'
 interface SidebarItemProps {
@@ -33,9 +33,11 @@ export default async function ProfilePage() {
                         <div className="relative w-24 h-24 rounded-full overflow-hidden border-4 border-white shadow-sm mb-3">
                             <Image src={profile?.avatarUrl || "/placeholder-user.png"} alt="Avatar" fill className="object-cover" />
                         </div>
-                        <button className="bg-[#002b45] text-white flex items-center gap-2 px-6 py-2 rounded-full text-xs font-bold shadow-md hover:bg-[#001d2e] transition">
-                            <span className="bg-white text-[#002b45] rounded-sm p-0.5">🛒</span> Start Selling
-                        </button>
+                        <Link href="/seller/add-product">
+                            <button className="w-full bg-[#002B45] text-white py-3 rounded-xl font-bold hover:bg-[#00365a] transition">
+                                Start Selling
+                            </button>
+                        </Link>
                     </div>
 
                     <nav className="space-y-1">
