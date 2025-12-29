@@ -65,7 +65,7 @@ console.log("SERVER ACTION: URL Gambar yang diterima:", imageUrl);
                 storeId: store.id,
                 imageUrl: imageUrl && imageUrl !== "" 
                     ? imageUrl 
-                    : "https://via.placeholder.com/500x500.png?text=No+Image",
+                    : "https://placehold.co/500x500/f2f7fa/002b45?text=No+Image",
             }
         });
     } catch (error) {

@@ -29,7 +29,7 @@ export default function ProductCard({ product }: ProductProps) {
 
 const imageSrc = product.imageUrl && product.imageUrl.startsWith('http') 
         ? product.imageUrl 
-        : "https://via.placeholder.com/500x500.png?text=No+Image";
+        : "https://placehold.co/500x500/f2f7fa/002b45?text=No+Image";
 
     const handleAddToCart = async (e: React.MouseEvent) => {
         e.preventDefault();

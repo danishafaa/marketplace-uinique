@@ -18,22 +18,22 @@ interface ProductItem {
 export default async function AllProductsPage({
     searchParams,
 }: {
-    searchParams: { search?: string };
+    searchParams: Promise<{ search?: string }>; // Ubah jadi Promise
 }) {
-    // 1. Tangkap kata kunci pencarian dari URL
-    const query = searchParams.search || "";
+    // UNWRAP PROMISE: Harus di-await sebelum diakses
+    const resolvedSearchParams = await searchParams;
+    const query = resolvedSearchParams.search || "";
     
     let formattedProducts: ProductItem[] = [];
 
     try {
-        // 2. Kirim perintah filter ke database Prisma
         const products = await prisma.product.findMany({
             where: query ? {
                 OR: [
                     { name: { contains: query, mode: 'insensitive' } },
                     { description: { contains: query, mode: 'insensitive' } },
                 ],
-            } : {}, // Jika query kosong, tampilkan semua
+            } : {},
             orderBy: { createdAt: 'desc' },
             include: { store: { select: { name: true } } },
         });
@@ -63,9 +63,7 @@ export default async function AllProductsPage({
                     </div>
                 )}
                 
-                {/* 3. PENTING: Tambahkan key={query}. 
-                  Ini memaksa React merender ulang komponen Client jika hasil pencarian berubah. 
-                */}
+                {/* Tambahkan key={query} agar komponen Client merender ulang saat mencari */}
                 <AllProductClient key={query} initialProducts={formattedProducts} />
             </main>
         </div>
