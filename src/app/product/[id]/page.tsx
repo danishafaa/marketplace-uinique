@@ -4,9 +4,11 @@ import ProductSpecs from "@/components/ProductSpecs";
 import { MessageCircle, Heart, Plus, Minus, ShoppingCart } from "lucide-react";
 
 export default async function ProductDetailPage({ params }: { params: { id: string } }) {
+  console.log("Mencari ID Produk:", params.id); // Cek di terminal VS Code
   const product = await getProductDetail(params.id);
-
-  if (!product) return <div className="p-20 text-center font-bold">Produk tidak ditemukan</div>;
+  console.log("Hasil Database:", product); // Jika null, berarti ID tidak ada di DB
+  
+  if (!product) return <div className="p-10 text-center">Produk tidak ditemukan</div>;
 
   return (
     <div className="min-h-screen bg-[#F0F2F5] pb-20 font-sans">
