@@ -66,21 +66,20 @@ export default function Header() {
                     </div>
                     {/* Tengah: Search Bar Bulat (SEKARANG BERFUNGSI) */}
                     <form onSubmit={handleSearch} className="flex-grow max-w-2xl relative hidden md:block">
-                        <div className="relative flex items-center">
-                            {/* PERBAIKAN: bg-white dan text-gray-800 */}
-                            <input
-                                type="text"
-                                placeholder="Search products..."
-                                value={searchQuery}
-                                onChange={(e) => setSearchQuery(e.target.value)}
-                                className="w-full py-2.5 px-12 rounded-full bg-white text-gray-800 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#002b45]"
-                            />
-                            {/* Search Icon berwarna abu-abu agar kontras di atas putih */}
-                            <button type="submit" className="absolute left-4 text-gray-500 hover:text-[#002b45]">
-                                <Search size={20} />
-                            </button>
-                        </div>
-                    </form>
+                    <div className="relative flex items-center">
+                    <input
+                    type="text"
+                    placeholder="Search products..."
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+            // bg-white agar solid putih, text-gray-800 agar teks terbaca
+                    className="w-full py-2.5 px-12 rounded-full bg-white text-gray-800 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-sky-400"
+                    />
+        <button type="submit" className="absolute left-4 text-gray-500 hover:text-[#002b45]">
+            <Search size={24} />
+        </button>
+    </div>
+</form>
                     {/* Sisi Kanan: Icons */}
                     <div className="flex items-center space-x-6">
                         {/* 1. Cart Icon */}
