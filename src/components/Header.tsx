@@ -10,10 +10,15 @@ import { Menu, Search, ShoppingCart, Heart, User } from 'lucide-react';
 // Tambahkan import tipe data dari supabase-js di bawah ini:
 import { createSupabaseClient as createClient } from '@/utils/supabase/client';
 import { AuthChangeEvent, Session, User as SupabaseUser } from '@supabase/supabase-js';
+import { useCartStore } from '@/store/useCartStore'
 export default function Header() {
     const router = useRouter();
     const [searchQuery, setSearchQuery] = useState("");
     const [user, setUser] = useState<SupabaseUser | null>(null);
+
+    // --- B. AMBIL DATA DARI ZUSTAND ---
+    // 'count' adalah angka keranjang, 'updateCount' adalah fungsi untuk refresh angka tersebut
+    const { count, updateCount, setCount } = useCartStore();
 
     useEffect(() => {
         const supabase = createClient();
@@ -22,18 +27,31 @@ export default function Header() {
         const checkUser = async () => {
             const { data: { user } } = await supabase.auth.getUser();
             setUser(user);
+        // --- C. AMBIL JUMLAH KERANJANG SAAT PERTAMA LOAD ---
+            if (user) {
+                await updateCount(); // Panggil fungsi sakti dari store
+            }
         };
         checkUser();
 
         // Pantau perubahan status login/logout secara realtime
         const { data: { subscription } } = supabase.auth.onAuthStateChange(
-            (_event: AuthChangeEvent, session: Session | null) => { // <-- Tambahkan tipe data di sini
-                setUser(session?.user ?? null);
-            }
-        );
+        async (_event: AuthChangeEvent, session: Session | null) => {
+            // Deklarasikan currentUser agar tidak 'Cannot find name'
+            const currentUser = session?.user ?? null; 
+            setUser(currentUser);
 
-        return () => subscription.unsubscribe();
-    }, []);
+            if (currentUser) {
+                // Sekarang 'await' diperbolehkan karena sudah ada 'async' di atas
+                await updateCount(); 
+            } else {
+                setCount(0); 
+            }
+        }
+    );
+
+    return () => subscription.unsubscribe();
+}, [updateCount, setCount]);
 
     // --- LOGIKA PENCARIAN ---
     const handleSearch = (e: React.FormEvent) => {

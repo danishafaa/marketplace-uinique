@@ -111,3 +111,40 @@ export async function getCheckoutItems() {
 
   return cart?.items || [];
 }
+
+export async function getCartCount() {
+    try {
+        const supabase = await createSupabaseServerClient();
+        const { data: { user } } = await supabase.auth.getUser();
+
+        if (!user) return 0;
+
+        // 1. Cari Keranjang menggunakan 'buyerId' sesuai skema kamu
+        const userCart = await prisma.cart.findFirst({
+            where: { 
+                buyerId: user.id // INI KUNCINYA: Pakai buyerId
+            },
+            select: { id: true }
+        });
+
+        // Jika keranjang belum ada, kembalikan 0
+        if (!userCart) return 0;
+
+        // 2. Hitung total quantity berdasarkan cartId
+        const result = await prisma.cartItem.aggregate({
+            where: {
+                cartId: userCart.id
+            },
+            _sum: {
+                quantity: true
+            }
+        });
+
+        // Pakai optional chaining '?' agar tidak error 'possibly undefined'
+        return result?._sum?.quantity || 0;
+        
+    } catch (error) {
+        console.error("Error fetching cart count:", error);
+        return 0;
+    }
+}
