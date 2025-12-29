@@ -6,6 +6,7 @@ import CartClient from './CartClient';
 export default async function CartPage() {
     const cart = await getCart();
 
+    // Proteksi jika user belum login atau keranjang kosong
     if (!cart) {
         redirect('/login');
     }
@@ -13,6 +14,7 @@ export default async function CartPage() {
     return (
         <div className="bg-[#f5f5f5] min-h-screen py-10">
             <div className="max-w-7xl mx-auto px-4">
+                {/* Mengirim data items ke komponen client */}
                 <CartClient initialItems={cart.items} />
             </div>
         </div>
