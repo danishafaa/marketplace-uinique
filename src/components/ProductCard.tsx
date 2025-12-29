@@ -38,16 +38,11 @@ export default function ProductCard({ product }: ProductProps) {
         try {
             const result = await addItemToCart(productId, 1);
             if (result.success) {
-                // 2. TAMBAHKAN INI: Beri tahu Header untuk memperbarui angka
+                // --- INI YANG BIKIN ANGKA BERUBAH ---
                 await updateCount(); 
-                
                 alert('Berhasil masuk keranjang!');
-            } else {
-                alert(result.message);
             }
-        } catch {
-            alert("Terjadi kesalahan sistem.");
-        }
+        } catch (error) { /* ... */ }
     };
 
     return (

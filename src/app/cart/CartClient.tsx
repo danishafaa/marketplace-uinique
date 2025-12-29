@@ -4,6 +4,7 @@ import React, { useState } from 'react';
 import Image from 'next/image';
 import Link from 'next/link'; // Import Link untuk navigasi
 import { updateCartQuantity, deleteCartItem } from '@/app/actions/cart';
+import { useCartStore } from '@/store/useCartStore';
 
 interface CartItem {
     id: string;
@@ -25,6 +26,16 @@ export default function CartClient({ initialItems }: { initialItems: CartItem[] 
 
     // Hitung berapa banyak produk yang dicentang
     const selectedItemsCount = items.filter(item => item.checked).length;
+
+    const { updateCount } = useCartStore();
+
+const handleRemoveItem = async (itemId: string) => {
+    const result = await deleteCartItem(itemId); // Fungsi yang tadi kita perbaiki
+    if (result.success) {
+        // --- PENTING: Update badge di Header setelah hapus ---
+        await updateCount(); 
+    }
+};
 
     return (
         <div className="space-y-6">
