@@ -67,16 +67,17 @@ export default function Header() {
                     {/* Tengah: Search Bar Bulat (SEKARANG BERFUNGSI) */}
                     <form onSubmit={handleSearch} className="flex-grow max-w-2xl relative hidden md:block">
                         <div className="relative flex items-center">
+                            {/* PERBAIKAN: bg-white dan text-gray-800 */}
                             <input
                                 type="text"
                                 placeholder="Search products..."
                                 value={searchQuery}
                                 onChange={(e) => setSearchQuery(e.target.value)}
-                                className="w-full py-2.5 px-12 rounded-full text-gray-800 focus:outline-none focus:ring-2 focus:ring-sky-400"
+                                className="w-full py-2 px-12 rounded-full bg-white text-black-800 placeholder-black-400 focus:outline-none focus:ring-2 focus:ring-sky-400"
                             />
-                            {/* Tombol Search Icon bisa diklik */}
-                            <button type="submit" className="absolute left-4 text-gray-500 hover:text-[#002b45]">
-                                <Search size={24} />
+                            {/* Search Icon berwarna abu-abu agar kontras di atas putih */}
+                            <button type="submit" className="absolute left-4 text-black-500 hover:text-[#002b45]">
+                                <Search size={20} />
                             </button>
                         </div>
                     </form>
@@ -119,9 +120,6 @@ export default function Header() {
                     <nav className="flex items-center space-x-10 text-[#002b45] font-semibold text-sm">
                         <Link href="/all-products" className="hover:text-white transition-colors">
                             Product
-                        </Link>
-                        <Link href="/promo" className="hover:text-white transition">
-                            Promo
                         </Link>
                         <Link href="/best-seller" className="hover:text-white transition">
                             Best Seller
