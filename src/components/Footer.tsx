@@ -52,9 +52,9 @@ export default function Footer() {
             </div>
           </div>
 
-          {/* SISI KANAN: Categories & Information */}
-          <div className="flex gap-16 md:gap-32">
-            {/* Categories */}
+          {/* SISI KANAN: DIUBAH MENJADI VERTIKAL */}
+          <div className="flex flex-col gap-12 min-w-[200px]">
+            {/* Categories Atas */}
             <div>
               <h3 className="font-bold text-lg mb-4">Categories</h3>
               <ul className="space-y-2 text-gray-600 text-sm">
@@ -65,7 +65,7 @@ export default function Footer() {
               </ul>
             </div>
 
-            {/* Information */}
+            {/* Information Bawah */}
             <div>
               <h3 className="font-bold text-lg mb-4">Information</h3>
               <ul className="space-y-2 text-gray-600 text-sm">
