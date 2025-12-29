@@ -73,10 +73,10 @@ export default function Header() {
                                 placeholder="Search products..."
                                 value={searchQuery}
                                 onChange={(e) => setSearchQuery(e.target.value)}
-                                className="w-full py-2 px-12 rounded-full bg-white text-black-800 placeholder-black-400 focus:outline-none focus:ring-2 focus:ring-sky-400"
+                                className="w-full py-2.5 px-12 rounded-full bg-white text-gray-800 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#002b45]"
                             />
                             {/* Search Icon berwarna abu-abu agar kontras di atas putih */}
-                            <button type="submit" className="absolute left-4 text-black-500 hover:text-[#002b45]">
+                            <button type="submit" className="absolute left-4 text-gray-500 hover:text-[#002b45]">
                                 <Search size={20} />
                             </button>
                         </div>
