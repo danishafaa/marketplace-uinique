@@ -1,10 +1,10 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   images: {
+    dangerouslyAllowSVG: true,
     remotePatterns: [
       {
         protocol: 'https',
-        // Masukkan hostname spesifik dari log kamu untuk kestabilan
         hostname: 'rhksbyflvnkjtnxohvtb.supabase.co', 
         port: '',
         pathname: '/storage/v1/object/public/**',
@@ -19,8 +19,14 @@ const nextConfig = {
         hostname: 'lh3.googleusercontent.com',
         pathname: '/**',
       },
+      // TAMBAHKAN INI: Agar placeholder internet tidak error 400
+      {
+        protocol: 'https',
+        hostname: 'via.placeholder.com',
+        pathname: '/**',
+      },
     ],
   },
 };
 
-export default nextConfig; // Gunakan export default jika filenya .ts atau .mjs
+export default nextConfig;

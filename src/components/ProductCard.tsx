@@ -27,6 +27,10 @@ export default function ProductCard({ product }: ProductProps) {
     const productId = String(product.id);
     const hasDiscount = product.originalPrice && product.originalPrice > product.price;
 
+const imageSrc = product.imageUrl && product.imageUrl.startsWith('http') 
+        ? product.imageUrl 
+        : "https://via.placeholder.com/500x500.png?text=No+Image";
+
     const handleAddToCart = async (e: React.MouseEvent) => {
         e.preventDefault();
         e.stopPropagation();
@@ -58,12 +62,12 @@ export default function ProductCard({ product }: ProductProps) {
             {/* GAMBAR PRODUK */}
             <div className="relative aspect-square mb-3 overflow-hidden rounded-xl bg-gray-50">
                 <Image
-                    src={displayImage}
+                    src={imageSrc}
                     alt={product.name}
                     fill
                     className="object-cover group-hover:scale-105 transition-transform duration-500"
-                    // 2. PERBAIKAN: Tambahkan sizes untuk menghilangkan warning di console
-                    sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 16vw"
+                    sizes="(max-width: 768px) 100vw, 16vw"
+                    unoptimized={true} // Menghindari Error 400 dari optimasi Next.js
                 />
 
                 {/* TOMBOL FAVORIT (Tetap di kanan atas) */}

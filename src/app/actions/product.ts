@@ -35,6 +35,8 @@ export async function addProduct(formData: FormData) {
     const isPreOrder = formData.get("isPreOrder") === "true";
     const isDiscount = formData.get("isDiscount") === "true";
 
+console.log("SERVER ACTION: URL Gambar yang diterima:", imageUrl);
+
     // Cari toko (Sementara ambil yang pertama, idealnya dari session user)
     const store = await prisma.store.findFirst();
     if (!store) return { success: false, message: "Store tidak ditemukan" };
@@ -61,7 +63,9 @@ export async function addProduct(formData: FormData) {
                 isPreOrder,
                 isDiscount,
                 storeId: store.id,
-                imageUrl: "/products/placeholder.jpg", // Nanti bisa diganti dengan upload asli
+                imageUrl: imageUrl && imageUrl !== "" 
+                    ? imageUrl 
+                    : "https://via.placeholder.com/500x500.png?text=No+Image",
             }
         });
     } catch (error) {
