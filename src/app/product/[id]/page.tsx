@@ -3,12 +3,28 @@ import SellerCard from "@/components/SellerCard";
 import ProductSpecs from "@/components/ProductSpecs";
 import { MessageCircle, Heart, Plus, Minus, ShoppingCart } from "lucide-react";
 
-export default async function ProductDetailPage({ params }: { params: { id: string } }) {
-  console.log("Mencari ID Produk:", params.id); // Cek di terminal VS Code
-  const product = await getProductDetail(params.id);
-  console.log("Hasil Database:", product); // Jika null, berarti ID tidak ada di DB
+export default async function ProductDetailPage({ 
+  params 
+}: { 
+  params: Promise<{ id: string }> // 1. Ubah tipe data params menjadi Promise
+}) {
+  // 2. Tambahkan baris ini untuk menunggu (await) nilai id
+  const { id } = await params; 
+
+  console.log("Mencari ID Produk:", id); 
   
-  if (!product) return <div className="p-10 text-center">Produk tidak ditemukan</div>;
+  // 3. Gunakan variabel 'id' yang sudah di-await
+  const product = await getProductDetail(id);
+  
+  console.log("Hasil Database:", product); 
+  
+  if (!product) {
+    return (
+      <div className="p-20 text-center font-bold">
+        Produk tidak ditemukan (ID: {id})
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-[#F0F2F5] pb-20 font-sans">
