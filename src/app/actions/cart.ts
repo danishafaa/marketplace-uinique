@@ -79,12 +79,24 @@ export async function updateCartQuantity(itemId: string, quantity: number) {
     revalidatePath('/cart');
 }
 
-// --- FUNGSI HAPUS ITEM ---
+// --- FUNGSI HAPUS ITEM (VERSI AMAN) ---
 export async function deleteCartItem(itemId: string) {
-    await prisma.cartItem.delete({
-        where: { id: itemId }
-    });
-    revalidatePath('/cart');
+    try {
+        // Kita gunakan 'deleteMany' alih-alih 'delete'. 
+        // Bedanya: 'deleteMany' tidak akan error/crash jika ID tidak ditemukan.
+        // Ia hanya akan mengembalikan jumlah "0 item terhapus".
+        await prisma.cartItem.deleteMany({
+            where: { id: itemId }
+        });
+
+        // Paksa halaman keranjang untuk memperbarui tampilannya
+        revalidatePath('/cart');
+        
+        return { success: true };
+    } catch (error) {
+        console.error("Gagal hapus item dari keranjang:", error);
+        return { success: false, message: "Terjadi kesalahan saat menghapus barang" };
+    }
 }
 
 // --- FUNGSI AMBIL DATA CHECKOUT (Hanya yang dicentang) ---
