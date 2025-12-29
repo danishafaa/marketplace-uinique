@@ -5,9 +5,13 @@ import Image from 'next/image';
 import NextLink from 'next/link';
 import { User, Bell, ClipboardList, Ticket } from "lucide-react";
 import { updateProfile } from '@/app/actions/profile';
+import { createSupabaseClient } from "@/utils/supabase/client";
 
 export default function ProfileClient({ initialProfile }: { initialProfile: any }) {
+    const supabase = createSupabaseClient();
     const [loading, setLoading] = useState(false);
+    const [imageFile, setImageFile] = useState<File | null>(null); // 2. Simpan file asli di sini
+    
     const [formData, setFormData] = useState({
         username: initialProfile?.username || "",
         name: initialProfile?.name || "",
@@ -24,24 +28,58 @@ export default function ProfileClient({ initialProfile }: { initialProfile: any 
         setFormData({ ...formData, [e.target.name]: e.target.value });
     };
 
-    const handleSave = async () => {
-        setLoading(true);
-        const result = await updateProfile(initialProfile.id, formData);
-        if (result.success) {
-            alert("Profile updated successfully!");
-        } else {
-            alert("Failed to update profile.");
-        }
-        setLoading(false);
-    };
-
+    // 3. Update fungsi handleImageChange untuk menangkap file asli
     const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
       const file = e.target.files?.[0];
       if (file) {
+        setImageFile(file); // Simpan file untuk di-upload nanti
         const reader = new FileReader();
         reader.onloadend = () => setAvatarPreview(reader.result as string);
         reader.readAsDataURL(file);
       }
+    };
+
+    const handleSave = async () => {
+        setLoading(true);
+        let finalAvatarUrl = avatarPreview;
+
+        try {
+            // 4. Logika Upload Gambar ke Supabase Storage
+            if (imageFile) {
+                const fileExt = imageFile.name.split('.').pop();
+                const fileName = `${initialProfile.id}-${Date.now()}.${fileExt}`;
+                const filePath = `avatars/${fileName}`;
+
+                // Upload ke bucket 'user-content' (Pastikan bucket ini sudah dibuat di Supabase)
+                const { error: uploadError } = await supabase.storage
+                    .from('user-content')
+                    .upload(filePath, imageFile);
+
+                if (uploadError) throw uploadError;
+
+                // Ambil Public URL setelah berhasil upload
+                const { data } = supabase.storage.from('user-content').getPublicUrl(filePath);
+                finalAvatarUrl = data.publicUrl;
+            }
+
+            // 5. Panggil Server Action dengan menyertakan URL gambar baru
+            const result = await updateProfile(initialProfile.id, {
+                ...formData,
+                avatarUrl: finalAvatarUrl
+            });
+
+            if (result.success) {
+                alert("Profile updated successfully!");
+                setImageFile(null); // Reset file state
+            } else {
+                alert("Failed to update profile database.");
+            }
+        } catch (error: any) {
+            console.error("Error:", error);
+            alert("Error: " + error.message);
+        } finally {
+            setLoading(false);
+        }
     };
 
     return (
@@ -73,7 +111,6 @@ export default function ProfileClient({ initialProfile }: { initialProfile: any 
                     <h1 className="text-2xl font-black text-[#002b45] border-b pb-6 mb-10">My Profile</h1>
 
                     <div className="flex flex-col lg:flex-row gap-16">
-                        {/* FORM FIELDS - WARNA TEKS DIPERTAJAM */}
                         <div className="flex-1 space-y-8">
                             <ProfileField label="Username" name="username" value={formData.username} onChange={handleChange} isInput />
                             <ProfileField label="Name" name="name" value={formData.name} onChange={handleChange} isInput />
@@ -81,7 +118,7 @@ export default function ProfileClient({ initialProfile }: { initialProfile: any 
                             <ProfileField label="Phone Number" name="phoneNumber" value={formData.phoneNumber} onChange={handleChange} isInput />
                             <ProfileField label="Shop Name" name="shopName" value={formData.shopName} onChange={handleChange} isInput />
 
-                            {/* GENDER SELECTION */}
+                            {/* GENDER */}
                             <div className="flex flex-col md:flex-row md:items-center gap-2 md:gap-8">
                                 <span className="text-base font-bold text-gray-700 w-32">Gender</span>
                                 <div className="flex gap-6">
@@ -94,7 +131,7 @@ export default function ProfileClient({ initialProfile }: { initialProfile: any 
                                 </div>
                             </div>
 
-                            {/* DATE OF BIRTH */}
+                            {/* DOB */}
                             <div className="flex flex-col md:flex-row md:items-center gap-2 md:gap-8">
                                 <span className="text-base font-bold text-gray-700 w-32">Date of Birth</span>
                                 <input type="date" name="dateOfBirth" value={formData.dateOfBirth} onChange={handleChange} className="flex-1 border-2 border-gray-200 rounded-2xl px-5 py-3 text-black font-bold focus:border-[#002b45] outline-none" />
@@ -131,6 +168,7 @@ export default function ProfileClient({ initialProfile }: { initialProfile: any 
     );
 }
 
+// ... SidebarItem dan ProfileField tetap sama seperti kode Anda sebelumnya ...
 function SidebarItem({ icon: Icon, label, active = false }: any) {
     return (
         <div className={`flex items-center gap-4 px-5 py-3 rounded-xl cursor-pointer transition ${active ? 'bg-white shadow-sm text-[#002b45]' : 'text-gray-500 hover:bg-gray-100'}`}>

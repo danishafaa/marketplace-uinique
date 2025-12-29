@@ -14,7 +14,7 @@ export async function updateProfile(userId: string, formData: any) {
         shopName: formData.shopName,
         gender: formData.gender,
         dateOfBirth: formData.dateOfBirth ? new Date(formData.dateOfBirth) : null,
-        // avatarUrl: formData.avatarUrl, // Opsional: jika sudah ada upload foto
+        avatarUrl: formData.avatarUrl,
       },
     });
     revalidatePath("/profile");
