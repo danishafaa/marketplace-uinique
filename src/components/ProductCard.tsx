@@ -23,7 +23,7 @@ interface ProductProps {
 
 export default function ProductCard({ product }: ProductProps) {
     // Penanganan fleksibel untuk gambar dan ID
-    const displayImage = product.imageUrl || product.image || '/placeholder.png';
+    const displayImage = product.imageUrl || product.image || '/placeholder.png'; 
     const productId = String(product.id);
     const hasDiscount = product.originalPrice && product.originalPrice > product.price;
 
@@ -62,6 +62,8 @@ export default function ProductCard({ product }: ProductProps) {
                     alt={product.name}
                     fill
                     className="object-cover group-hover:scale-105 transition-transform duration-500"
+                    // 2. PERBAIKAN: Tambahkan sizes untuk menghilangkan warning di console
+                    sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 16vw"
                 />
 
                 {/* TOMBOL FAVORIT (Tetap di kanan atas) */}
