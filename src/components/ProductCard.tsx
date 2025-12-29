@@ -45,7 +45,7 @@ export default function ProductCard({ product }: ProductProps) {
 
     return (
         <Link
-            href={`/products/${productId}`}
+            href={`/product/${productId}`}
             className="group block bg-white p-4 rounded-2xl shadow-sm border border-gray-100 hover:shadow-lg transition-all duration-300 relative h-full flex flex-col"
         >
             {/* 2. Badge Best Seller di pojok kiri atas sesuai desain */}
