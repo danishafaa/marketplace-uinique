@@ -1,8 +1,10 @@
 // src/app/seller/add-product/page.tsx
 'use client';
 
-import { useState } from 'react';
+import { useState, useRef } from 'react';
 import { addProduct } from "@/app/actions/product";
+import { createSupabaseClient } from "@/utils/supabase/client"; // Pastikan nama import sesuai
+import Image from 'next/image';
 
 // --- KOMPONEN TOGGLE SWITCH ---
 function ToggleSwitch({ name, label, defaultChecked = false }: { name: string, label: string, defaultChecked?: boolean }) {
@@ -24,13 +26,60 @@ function ToggleSwitch({ name, label, defaultChecked = false }: { name: string, l
 export default function AddProductPage() {
     const [isLoading, setIsLoading] = useState(false);
     const [errorMessage, setErrorMessage] = useState("");
+    
+    // 1. Tambahkan state untuk file dan preview gambar
+    const [imageFile, setImageFile] = useState<File | null>(null);
+    const [imagePreview, setImagePreview] = useState<string | null>(null);
+    const fileInputRef = useRef<HTMLInputElement>(null);
+    const supabase = createSupabaseClient(); // Inisialisasi Supabase
 
-    async function handleSubmit(formData: FormData) {
+    // 2. Fungsi untuk menangani saat gambar dipilih
+    const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const file = e.target.files?.[0];
+        if (file) {
+            setImageFile(file);
+            const reader = new FileReader();
+            reader.onloadend = () => setImagePreview(reader.result as string);
+            reader.readAsDataURL(file);
+        }
+    };
+
+    async function handleFormSubmit(event: React.FormEvent<HTMLFormElement>) {
+        event.preventDefault(); // Kita gunakan preventDefault untuk upload storage dulu
         setIsLoading(true);
         setErrorMessage("");
-        const result = await addProduct(formData);
-        if (result && !result.success) {
-            setErrorMessage(result.message);
+
+        const formData = new FormData(event.currentTarget);
+        let publicUrl = "";
+
+        try {
+            // 3. Upload ke Supabase Storage jika ada gambar yang dipilih
+            if (imageFile) {
+                const fileName = `product-${Date.now()}-${imageFile.name}`;
+                const { data, error } = await supabase.storage
+                    .from('product-images') // Gunakan bucket yang sudah Anda buat
+                    .upload(fileName, imageFile);
+
+                if (error) throw error;
+
+                // Ambil Public URL
+                const { data: urlData } = supabase.storage.from('product-images').getPublicUrl(fileName);
+                publicUrl = urlData.publicUrl;
+            }
+
+            // Tambahkan URL gambar ke formData sebelum dikirim ke server action
+            formData.append("imageUrl", publicUrl);
+
+            const result = await addProduct(formData);
+            if (result && !result.success) {
+                setErrorMessage(result.message);
+            } else {
+                alert("Produk berhasil ditambahkan!");
+                window.location.href = "/product"; // Redirect setelah sukses
+            }
+        } catch (error: any) {
+            setErrorMessage(error.message || "Gagal mengunggah gambar");
+        } finally {
             setIsLoading(false);
         }
     }
@@ -43,7 +92,7 @@ export default function AddProductPage() {
             <div className="container mx-auto max-w-4xl px-4">
                 <h1 className="text-2xl font-bold mb-8 text-gray-800">Add sales products</h1>
 
-                <form action={handleSubmit} className="space-y-6 pb-20">
+                <form onSubmit={handleFormSubmit} className="space-y-6 pb-20">
                     {errorMessage && (
                         <div className="bg-red-50 text-red-500 p-4 rounded-xl text-sm font-bold border border-red-100">{errorMessage}</div>
                     )}

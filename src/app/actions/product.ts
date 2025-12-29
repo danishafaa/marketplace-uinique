@@ -27,7 +27,11 @@ export async function addProduct(formData: FormData) {
     const stock = Number(formData.get("stock"));
     const minOrder = Number(formData.get("minOrder")) || 1;
 
-    // 4. Ambil Status Toggle (Konversi string "true"/"false" ke Boolean)
+    // 4. AMBIL URL GAMBAR DARI FORM DATA
+    // Ini adalah link yang kita append di page.tsx sebelumnya
+    const imageUrl = formData.get("imageUrl") as string;
+
+    // 5. Ambil Status Toggle (Konversi string "true"/"false" ke Boolean)
     const isPreOrder = formData.get("isPreOrder") === "true";
     const isDiscount = formData.get("isDiscount") === "true";
 
