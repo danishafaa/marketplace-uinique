@@ -73,3 +73,15 @@ export async function addProduct(formData: FormData) {
     // Kembali ke homepage setelah sukses
     redirect("/");
 }
+export async function getProductDetail(id: string) {
+  try {
+    const product = await prisma.product.findUnique({
+      where: { id },
+      include: { store: true } // Mengambil data toko yang terkait
+    });
+    return product;
+  } catch (error) {
+    console.error("Gagal mengambil detail produk:", error);
+    return null;
+  }
+}
