@@ -42,7 +42,9 @@ export default function ProductCard({ product }: ProductProps) {
                 await updateCount(); 
                 alert('Berhasil masuk keranjang!');
             }
-        } catch (error) { /* ... */ }
+        } catch (error) {
+        console.error(error);
+    }
     };
 
     return (

@@ -102,12 +102,14 @@ export default function Header() {
                     <div className="flex items-center space-x-6">
                         {/* 1. Cart Icon */}
                         <Link href="/cart" className="relative hover:text-sky-300 transition p-1" title="Keranjang">
-                            <ShoppingCart size={32} />
-                            {/* Badge Merah (Statis dulu) */}
-                            <span className="absolute -top-1 -right-2 bg-red-600 text-[10px] font-bold px-1.5 rounded-full">
-                                0
-                            </span>
-                        </Link>
+    <ShoppingCart size={32} />
+    {/* Pastikan ini 'count' bukan angka '0' manual */}
+    {count > 0 && (
+        <span className="absolute -top-1 -right-2 bg-red-600 text-white text-[10px] font-bold px-1.5 py-0.5 rounded-full min-w-[18px] text-center">
+            {count}
+        </span>
+    )}
+</Link>
                         {/* 2. Favorite Icon (INI YANG DIPERBAIKI) */}
                         <Link
                             href="/favorites"

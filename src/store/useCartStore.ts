@@ -11,18 +11,13 @@ interface CartState {
 
 // 2. Buat Store (Papan Pengumumannya)
 export const useCartStore = create<CartState>((set) => ({
-  count: 0, // Awalnya angka keranjang adalah 0
-
-  // Fungsi untuk menset angka secara langsung
+  count: 0,
   setCount: (num) => set({ count: num }),
-
-  // Fungsi paling penting: Ambil data terbaru dari server
   updateCount: async () => {
-    try {
-      const newCount = await getCartCount(); // Memanggil fungsi yang pakai 'buyerId' tadi
-      set({ count: Number(newCount) });      // Update angka di papan pengumuman
-    } catch (error) {
-      console.error("Gagal update angka keranjang di store:", error);
-    }
+    // Ambil data langsung dari server action
+    const newCount = await getCartCount();
+    console.log("STORE DEBUG: Angka baru dari DB adalah:", newCount); 
+    // Pastikan angka di-set ke state
+    set({ count: Number(newCount) });
   },
 }));
